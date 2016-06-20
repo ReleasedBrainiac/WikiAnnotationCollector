@@ -21,4 +21,5 @@ The tool will be started on the command line using the main method of XMLParserS
 and also a enwiki.xml filename as argument. (The file and the tool need to be in the same folder.)
 The result xml appears also in the tool folder. Have some fun with it. :)
 
-Greetings from ReleasedBrainiac
+Greetings 
+ReleasedBrainiac

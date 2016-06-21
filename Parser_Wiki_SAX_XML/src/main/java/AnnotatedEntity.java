@@ -44,14 +44,20 @@ public class AnnotatedEntity
 	
 	public void getAnnotedTextOnly(String text, List<AnnotObject> annotedObjects)
 	{
+		List<String> content = new ArrayList<String>(); 
+		String line;
+		boolean isRex = false;
+		
 		//TODO Regex start end reference tags over multiple lines => http://www.rexegg.com/regex-quickstart.html
 		
 //		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-//		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+//		String regexRefLines = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+		
 		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
 		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
 		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
-//		String regexRefLines = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+
 		
 		List<String> sentences = Arrays.asList(text.split("\n"));		
 		
@@ -59,36 +65,63 @@ public class AnnotatedEntity
 		{
 			for(int k = 0; k < sentences.size(); k++)
 			{
-				String tmp = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
+				String subSentence = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
+				Appendings ape = null;
 				
 				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
-				iterator.setText(tmp);
+				iterator.setText(subSentence);
 				int start = iterator.first();
+				
 				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
 				{
-				  System.out.println(tmp.substring(start,end));
+					
+					line = subSentence.substring(start,end).replaceAll(regexUri, "");
+//					System.out.println("Line: "+line);
+					
+					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}W"))
+					{
+						if(line.contains("{{"))
+						{
+							isRex = true;
+							ape = new Appendings("{{","}}");
+							ape.appending(line);
+						}
+						
+						if(line.contains("<ref"))
+						{
+							isRex = true;
+							ape = new Appendings("<ref","</ref>");
+							ape.appending(line);
+						}
+						
+						if(isRex && ape != null)
+						{
+							if(line.contains("</ref>") || line.contains("}}"))
+							{
+								ape.appending(line);
+								content.add(ape.getCleanContent());
+								isRex = false;
+								
+							}else{
+								ape.appending(line);
+							}
+						}else{
+//							System.out.println("APE null or no regEX discovered!");
+						}
+						
+					}else{
+						
+						if(line.indexOf("*") != 0)
+						{
+								
+							System.out.println(line);
+							content.add(line);
+						}
+					}	
 				}
 			}
-			System.out.println("DONE");
+			System.out.println("DONE [content size : "+content.size()+"]");
 		}
-		
-//		for (int i = 0; i < sentences.size(); i++) 
-//		{
-//			
-//			if(!sentences.get(i).contains("File:") && !sentences.get(i).contains("Image:") && !sentences.get(i).contains("#REDIRECT"))
-//			{
-//				Pattern pat = Pattern.compile(regexStr);	
-//				Matcher m = pat.matcher(sentences.get(i));
-//
-//				if(m.find())
-//				{
-//					System.out.println("Annot => "+m.group());
-//					annotedObjects.add(new AnnotObject(sentences.get(i))); 
-//					System.exit(0);
-//				}
-//				
-//			}
-//		}
 	}
 	
 	//############################################################################################

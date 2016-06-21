@@ -1,8 +1,10 @@
 package main.java;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,34 +44,33 @@ public class AnnotatedEntity
 	
 	public void getAnnotedTextOnly(String text, List<AnnotObject> annotedObjects)
 	{
-		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-//		String regexGK = "\\{\\{[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]}}";
+		//TODO Regex start end reference tags over multiple lines => http://www.rexegg.com/regex-quickstart.html
+		
+//		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
+//		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
 		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
 		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+//		String regexRefLines = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
 		
 		List<String> sentences = Arrays.asList(text.split("\n"));		
-		
-		System.out.println("Size test: "+sentences.size());
 		
 		if(sentences.size() > 10)
 		{
 			for(int k = 0; k < sentences.size(); k++)
 			{
-				String tmp = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "");
+				String tmp = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
 				
-				if(tmp.length() > 0)
+				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+				iterator.setText(tmp);
+				int start = iterator.first();
+				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
 				{
-					if(tmp.contains("{{"))
-					{
-						
-					}
-					System.out.println(tmp);
+				  System.out.println(tmp.substring(start,end));
 				}
 			}
+			System.out.println("DONE");
 		}
-		
-		System.out.println("DONE");
 		
 //		for (int i = 0; i < sentences.size(); i++) 
 //		{

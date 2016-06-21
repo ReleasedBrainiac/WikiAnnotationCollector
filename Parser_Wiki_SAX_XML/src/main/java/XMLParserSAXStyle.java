@@ -1,12 +1,17 @@
 package main.java;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -20,6 +25,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	private static List<AnnotatedEntity> anotEnts = new ArrayList<AnnotatedEntity>();
 	private static String text = null;
 	private static boolean isTextTag =false;
+	private boolean fullTextAbstraction = false;
 
 	/**
 	 * Override: Now check existence of the tag your searching for.
@@ -27,6 +33,8 @@ public class XMLParserSAXStyle extends DefaultHandler
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException 
 	{
+		text = "";
+		isTextTag = false;
 		if(qName.equalsIgnoreCase("text")) isTextTag=true;
 	}
 
@@ -36,11 +44,12 @@ public class XMLParserSAXStyle extends DefaultHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException 
 	{
+		//TODO nur testcase
 		switch (qName) 
 		{
 			case "text":
 			{
-				anotEnts.add(new AnnotatedEntity(text));
+				anotEnts.add(new AnnotatedEntity(text, isFullTextAbstraction()));
 			}	
 		}
 	}
@@ -51,10 +60,19 @@ public class XMLParserSAXStyle extends DefaultHandler
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException 
 	{
-		if(isTextTag){
-			text = new String(ch, start, length);
+		if(isTextTag)
+		{	
+			text += new String(ch, start, length);
 		}
-		isTextTag = false;
+		
+	}
+	
+	public boolean isFullTextAbstraction() {
+		return fullTextAbstraction;
+	}
+
+	public void setFullTextAbstraction(boolean isFullTextAbstraction) {
+		this.fullTextAbstraction = isFullTextAbstraction;
 	}
 
 	/**
@@ -67,18 +85,42 @@ public class XMLParserSAXStyle extends DefaultHandler
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException 
 	{
 		
+		
+		
+		    	      
+		
+		    	      
+		//String path = args[0];
+		String path = "C:/Users/Tobia/Desktop/Texteressourcen für Arbeit/enwiki-latest-pages-articles1.xml";
+		
+		//For UTF-8 Setup
+		File file = new File(path);
+		InputStream inputStream= new FileInputStream(file);
+		Reader reader = new InputStreamReader(inputStream,"UTF-8");
+		InputSource is = new InputSource(reader);
+		is.setEncoding("UTF-8");
+		
+		//Init Parser
 		SAXParserFactory parserFactor = SAXParserFactory.newInstance();
 		SAXParser parser = parserFactor.newSAXParser();
 		XMLParserSAXStyle handler = new XMLParserSAXStyle();
-		parser.parse(new File(args[0]), handler);
+		handler.setFullTextAbstraction(true);
+		parser.parse(is, handler);
+		
 		String fileName = "en-wiki-annotations-and-depencies.xml";	// = args[1] //is also a possible option to implement.
 		String rootElement = "wikiAnnotations";						// = args[2] //is also a possible option to implement.
 		
-		//generate xml file
-		new FileGenerator(fileName);
+		if(handler.isFullTextAbstraction())
+		{
+			
+		}else{
+			//generate xml file
+			new FileGenerator(fileName);
+			
+			//save content to it
+			new StoringContent(fileName, rootElement, anotEnts);
+		}
 		
-		//save content to it
-		new StoringContent(fileName, rootElement, anotEnts);
 		
 	}
 }

@@ -11,7 +11,16 @@ import java.util.List;
 public class AnnotObject
 {
 	private String annotedWord;
+	private String annotedSentence;
 	private List<String> correspondingURLs = new ArrayList<String>();
+	
+	
+	public AnnotObject(String annotedSentence)
+	{
+		this.annotedSentence = annotedSentence;
+		this.annotedWord = null;
+		this.correspondingURLs = null;
+	}
 	
 	/**
 	 * Constructor just keep the given content
@@ -20,6 +29,7 @@ public class AnnotObject
 	 */
 	public AnnotObject(String annotedWord, List<String> correspondingURLs)
 	{
+		this.annotedSentence = null;
 		this.annotedWord = annotedWord;
 		this.correspondingURLs = correspondingURLs;
 	}

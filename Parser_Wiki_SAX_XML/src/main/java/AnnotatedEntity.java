@@ -25,9 +25,69 @@ public class AnnotatedEntity
 	 * annotations and the creation of there corresponding url's.
 	 * @param annotedText
 	 */
-	public AnnotatedEntity(String annotedText)
+	public AnnotatedEntity(String annotedText, boolean isFullTextAbstraction)
 	{
-		getAnnotationsAndUrls(annotedText, annotedObjects);
+		if(isFullTextAbstraction)
+		{
+			getAnnotedTextOnly(annotedText, annotedObjects);
+		}else{
+			getAnnotationsAndUrls(annotedText, annotedObjects);
+		}
+		
+	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
+	public void getAnnotedTextOnly(String text, List<AnnotObject> annotedObjects)
+	{
+		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
+		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+//		String regexGK = "\\{\\{[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]}}";
+		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
+		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+		
+		List<String> sentences = Arrays.asList(text.split("\n"));		
+		
+		System.out.println("Size test: "+sentences.size());
+		
+		if(sentences.size() > 10)
+		{
+			for(int k = 0; k < sentences.size(); k++)
+			{
+				String tmp = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "");
+				
+				if(tmp.length() > 0)
+				{
+					if(tmp.contains("{{"))
+					{
+						
+					}
+					System.out.println(tmp);
+				}
+			}
+		}
+		
+		System.out.println("DONE");
+		
+//		for (int i = 0; i < sentences.size(); i++) 
+//		{
+//			
+//			if(!sentences.get(i).contains("File:") && !sentences.get(i).contains("Image:") && !sentences.get(i).contains("#REDIRECT"))
+//			{
+//				Pattern pat = Pattern.compile(regexStr);	
+//				Matcher m = pat.matcher(sentences.get(i));
+//
+//				if(m.find())
+//				{
+//					System.out.println("Annot => "+m.group());
+//					annotedObjects.add(new AnnotObject(sentences.get(i))); 
+//					System.exit(0);
+//				}
+//				
+//			}
+//		}
 	}
 	
 	//############################################################################################
@@ -44,7 +104,7 @@ public class AnnotatedEntity
 	public void getAnnotationsAndUrls(String text, List<AnnotObject> annotedObjects)
 	{
 		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-		List<String> annotedWords2 = new ArrayList<String>();
+//		List<String> annotedWords2 = new ArrayList<String>();
 		List<String> correspondingURLs2 = new ArrayList<String>();
 		List<String> sentences = Arrays.asList(text.split("\\."));		
 		
@@ -61,7 +121,7 @@ public class AnnotatedEntity
 					 String annotation = m.group(1);
 					 String[] tmp;
 					 correspondingURLs2 = new ArrayList<String>();
-					 annotedWords2.add(annotation);
+//					 annotedWords2.add(annotation);
 					 
 					 if(annotation.contains("|"))
 					 {

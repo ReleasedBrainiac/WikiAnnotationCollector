@@ -49,9 +49,11 @@ public class AnnotatedEntity
 		boolean isRex = false;
 		
 		//TODO Regex start end reference tags over multiple lines => http://www.rexegg.com/regex-quickstart.html
+		//TODO Wichtig MARKUP -> https://en.wikipedia.org/wiki/Help:Wiki_markup
+		
 		
 //		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-		String regexUri = "\\b(http?|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 //		String regexRefLines = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
 		
 		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
@@ -74,54 +76,135 @@ public class AnnotatedEntity
 				
 				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
 				{
-					
 					line = subSentence.substring(start,end).replaceAll(regexUri, "");
-//					System.out.println("Line: "+line);
 					
-					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}W"))
-					{
-						if(line.contains("{{"))
-						{
-							isRex = true;
-							ape = new Appendings("{{","}}");
-							ape.appending(line);
-						}
-						
-						if(line.contains("<ref"))
-						{
-							isRex = true;
-							ape = new Appendings("<ref","</ref>");
-							ape.appending(line);
-						}
-						
-						if(isRex && ape != null)
-						{
-							if(line.contains("</ref>") || line.contains("}}"))
-							{
-								ape.appending(line);
-								content.add(ape.getCleanContent());
-								isRex = false;
-								
-							}else{
-								ape.appending(line);
-							}
-						}else{
-//							System.out.println("APE null or no regEX discovered!");
-						}
-						
-					}else{
-						
-						if(line.indexOf("*") != 0)
-						{
-								
-							System.out.println(line);
-							content.add(line);
-						}
-					}	
+//					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
+//						{
+//							if(line.contains("{{"))
+//							{
+//								isRex = true;
+//								ape = new Appendings("{{","}}");
+//								ape.appending(line);
+//							}
+//							
+//							if(line.contains("<ref"))
+//							{
+//								isRex = true;
+//								ape = new Appendings("<ref","</ref>");
+//								ape.appending(line);
+//							}
+//							
+//							if(isRex && ape != null)
+//							{
+//								if(line.contains("</ref>") || line.contains("}}"))
+//								{
+//									ape.appending(line);
+//									
+//									System.out.println("APE _-> "+ape.getCleanContent());
+//									
+//									content.add(ape.getCleanContent());
+//									
+//									
+//									isRex = false;
+//									
+//								}else{
+//									ape.appending(line);
+//								}
+//							}
+//							
+//						}else{
+//							
+//							if(line.contains("[[") && line.contains("]]"))
+//							{
+//								if(line.indexOf("*") != 0)
+//								{
+//										
+//									content.add(line);
+//								}
+//							}else{
+//								//Skip the unused Crap
+//							}
+//							
+//							
+//						}
+					content.add(line);
 				}
 			}
+			
+			
+			System.out.println("Test Print of Content!");
+			
+			for(String str : content)
+			{
+				System.out.println(str);
+			}
+			
 			System.out.println("DONE [content size : "+content.size()+"]");
+			
 		}
+	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
+	public String cleaningContent(String line, boolean isRex, Appendings ape)
+	{	
+		String retStr = null;
+		
+//		if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
+//			{
+//				if(line.contains("{{"))
+//				{
+//					isRex = true;
+//					ape = new Appendings("{{","}}");
+//					ape.appending(line);
+//				}
+//				
+//				if(line.contains("<ref"))
+//				{
+//					isRex = true;
+//					ape = new Appendings("<ref","</ref>");
+//					ape.appending(line);
+//				}
+//				
+//				if(isRex && ape != null)
+//				{
+//					if(line.contains("</ref>") || line.contains("}}"))
+//					{
+//						ape.appending(line);
+//						
+//						System.out.println("APE _-> "+ape.getCleanContent());
+//						
+//						content.add(ape.getCleanContent());
+//						
+//						
+//						isRex = false;
+//						
+//					}else{
+//						ape.appending(line);
+//					}
+//				}else{
+////					System.out.println("APE null or no regEX discovered!");
+//				}
+//				
+//			}else{
+//				
+//				if(line.contains("[[") && line.contains("]]"))
+//				{
+//					if(line.indexOf("*") != 0)
+//					{
+//							
+//						content.add(line);
+//					}
+//				}else{
+//					//Skip the unused Crap
+//				}
+//				
+//				
+//			}	
+		
+		return retStr;
 	}
 	
 	//############################################################################################

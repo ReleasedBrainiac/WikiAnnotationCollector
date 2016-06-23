@@ -76,63 +76,51 @@ public class AnnotatedEntity
 				
 				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
 				{
-					line = subSentence.substring(start,end).replaceAll(regexUri, "");
+					line = subSentence.substring(start,end).replaceAll(regexUri, "").replaceAll("'", "");
 					
-//					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
-//						{
-//							if(line.contains("{{"))
-//							{
-//								isRex = true;
-//								ape = new Appendings("{{","}}");
-//								ape.appending(line);
-//							}
-//							
-//							if(line.contains("<ref"))
-//							{
-//								isRex = true;
-//								ape = new Appendings("<ref","</ref>");
-//								ape.appending(line);
-//							}
-//							
-//							if(isRex && ape != null)
-//							{
-//								if(line.contains("</ref>") || line.contains("}}"))
-//								{
-//									ape.appending(line);
-//									
-//									System.out.println("APE _-> "+ape.getCleanContent());
-//									
-//									content.add(ape.getCleanContent());
-//									
-//									
-//									isRex = false;
-//									
-//								}else{
-//									ape.appending(line);
-//								}
-//							}
-//							
-//						}else{
-//							
-//							if(line.contains("[[") && line.contains("]]"))
-//							{
-//								if(line.indexOf("*") != 0)
-//								{
-//										
-//									content.add(line);
-//								}
-//							}else{
-//								//Skip the unused Crap
-//							}
-//							
-//							
-//						}
-					content.add(line);
+					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
+						{
+							if(line.contains("{{"))
+							{
+								isRex = true;
+								ape = new Appendings("{{","}}");
+								ape.appending(line);
+							}
+							
+							if(line.contains("<ref"))
+							{
+								isRex = true;
+								ape = new Appendings("<ref","</ref>");
+								ape.appending(line);
+							}
+							
+							if(isRex && ape != null)
+							{
+								if(line.contains("</ref>") || line.contains("}}") || line.contains("/>"))
+								{
+									//TODO beim bereinigen den regEx ersetzen falls der endTag anders ist bei der REF!
+									
+									ape.appending(line);									
+									content.add(ape.getAppendings());
+									isRex = false;
+									
+								}else{
+									ape.appending(line);
+								}
+							}
+							
+						}else{
+							
+							if(line.indexOf("*") != 0)
+							{
+									
+								content.add(line);
+							}
+							
+							
+						}
 				}
 			}
-			
-			
-			System.out.println("Test Print of Content!");
 			
 			for(String str : content)
 			{

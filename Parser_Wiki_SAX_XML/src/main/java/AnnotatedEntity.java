@@ -47,7 +47,7 @@ public class AnnotatedEntity
 	{
 		List<String> content = new ArrayList<String>(); 
 		String line;
-		boolean isRex = false;
+		boolean isRex = false; 
 		
 		//TODO Regex start end reference tags over multiple lines => http://www.rexegg.com/regex-quickstart.html
 		//TODO Wichtig MARKUP -> https://en.wikipedia.org/wiki/Help:Wiki_markup

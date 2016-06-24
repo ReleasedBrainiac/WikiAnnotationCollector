@@ -31,7 +31,8 @@ public class AnnotatedEntity
 	{
 		if(isFullTextAbstraction)
 		{
-			getAnnotedTextOnly(annotedText, annotedObjects);
+			getAnnotedTextOnly(annotedText, annotedObjects);	
+			
 		}else{
 			getAnnotationsAndUrls(annotedText, annotedObjects);
 		}
@@ -52,13 +53,12 @@ public class AnnotatedEntity
 		//TODO Wichtig MARKUP -> https://en.wikipedia.org/wiki/Help:Wiki_markup
 		
 		
-//		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
+		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
 		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-//		String regexRefLines = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
-		
 		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
 		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
 		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");
 
 		
 		List<String> sentences = Arrays.asList(text.split("\n"));		
@@ -100,8 +100,13 @@ public class AnnotatedEntity
 								{
 									//TODO beim bereinigen den regEx ersetzen falls der endTag anders ist bei der REF!
 									
-									ape.appending(line);									
-									content.add(ape.getAppendings());
+									ape.appending(line);
+									
+									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
+									{
+										content.add(ape.getAppendings().replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, ""));
+									}
+									
 									isRex = false;
 									
 								}else{
@@ -111,9 +116,9 @@ public class AnnotatedEntity
 							
 						}else{
 							
-							if(line.indexOf("*") != 0)
+							if(line.indexOf("*") != 0 && line.contains("[[") && line.contains("]]") && line.contains(".")&& !line.contains("[[File:") && !line.contains("[[Image:"))
 							{
-									
+								line.replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("", " ");
 								content.add(line);
 							}
 							

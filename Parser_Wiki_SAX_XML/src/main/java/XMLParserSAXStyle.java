@@ -25,7 +25,6 @@ public class XMLParserSAXStyle extends DefaultHandler
 	private static List<AnnotatedEntity> anotEnts = new ArrayList<AnnotatedEntity>();
 	private static String text = null;
 	private static boolean isTextTag =false;
-	private boolean fullTextAbstraction = false;
 
 	/**
 	 * Override: Now check existence of the tag your searching for.
@@ -49,7 +48,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 		{
 			case "text":
 			{
-				anotEnts.add(new AnnotatedEntity(text, isFullTextAbstraction()));
+				anotEnts.add(new AnnotatedEntity(text));
 			}	
 		}
 	}
@@ -66,14 +65,6 @@ public class XMLParserSAXStyle extends DefaultHandler
 		}
 		
 	}
-	
-	public boolean isFullTextAbstraction() {
-		return fullTextAbstraction;
-	}
-
-	public void setFullTextAbstraction(boolean isFullTextAbstraction) {
-		this.fullTextAbstraction = isFullTextAbstraction;
-	}
 
 	/**
 	 * Central Main-method for the tool.
@@ -84,12 +75,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	 */
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException 
 	{
-		
-		
-		
-		    	      
-		
-		    	      
+
 		//String path = args[0];
 		String path = "C:/Users/Tobia/Desktop/Texteressourcen für Arbeit/enwiki-latest-pages-articles1.xml";
 		
@@ -104,22 +90,16 @@ public class XMLParserSAXStyle extends DefaultHandler
 		SAXParserFactory parserFactor = SAXParserFactory.newInstance();
 		SAXParser parser = parserFactor.newSAXParser();
 		XMLParserSAXStyle handler = new XMLParserSAXStyle();
-		handler.setFullTextAbstraction(true);
 		parser.parse(is, handler);
 		
 		String fileName = "en-wiki-annotations-and-depencies.xml";	// = args[1] //is also a possible option to implement.
 		String rootElement = "wikiAnnotations";						// = args[2] //is also a possible option to implement.
 		
-		if(handler.isFullTextAbstraction())
-		{
-			
-		}else{
-			//generate xml file
-			new FileGenerator(fileName);
-			
-			//save content to it
-			new StoringContent(fileName, rootElement, anotEnts);
-		}
+		//generate xml file
+		new FileGenerator(fileName);
+		
+		//save content to it
+		new StoringContent(fileName, rootElement, anotEnts);
 		
 		
 	}

@@ -45,6 +45,7 @@ public class StoringContent
 	{
 	    Document dom;
 	    Element objectElem = null;
+	    Element sentenceElem = null;
 	    Element wordElem = null;
 	    Element subElem = null;
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -76,6 +77,10 @@ public class StoringContent
 				        rootElem.appendChild(objectElem);
 				        
 			        	AnnotObject ao = aoList.get(j);
+			        	
+			        	sentenceElem  = dom.createElement("Sentence");
+			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+			        	objectElem.appendChild(sentenceElem);
 			        	
 			        	wordElem = dom.createElement("Annotation");
 			        	wordElem.appendChild(dom.createTextNode(ao.getAnnotedWord()));

@@ -24,16 +24,25 @@ public class AnnotObject
 	
 	/**
 	 * Constructor just keep the given content
+	 * @param annotedSentence
 	 * @param annotedWord
 	 * @param correspondingURLs
 	 */
-	public AnnotObject(String annotedWord, List<String> correspondingURLs)
+	public AnnotObject(String annotedSentence, String annotedWord, List<String> correspondingURLs)
 	{
-		this.annotedSentence = null;
+		this.annotedSentence = annotedSentence;
 		this.annotedWord = annotedWord;
 		this.correspondingURLs = correspondingURLs;
 	}
 	
+	public String getAnnotedSentence() {
+		return annotedSentence;
+	}
+
+	public void setAnnotedSentence(String annotedSentence) {
+		this.annotedSentence = annotedSentence;
+	}
+
 	public String getAnnotedWord() {
 		return annotedWord;
 	}

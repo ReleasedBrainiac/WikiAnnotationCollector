@@ -7,18 +7,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 /**
- * This class is used for the gathering of text annotation from given "Wikipedia dump file" [Linear]
+ * This class is used for the gathering of text annotation from given "Wikipedia dump file" 
  * and the generation of there corresponding url's  
  * @author T.Turke
  */
 public class AnnotatedEntity 
 {
 	private List<AnnotObject> annotedObjects = new ArrayList<AnnotObject>();
-	private List<String> sentencesLinear = new ArrayList<String>();
-	private List<String> sentencesParallel = new ArrayList<String>();
+	private List<String> sentences = new ArrayList<String>();
 	
 	/**
 	 * Initials constructor no parameters
@@ -31,14 +29,14 @@ public class AnnotatedEntity
 	 * @param annotedText
 	 */
 	public AnnotatedEntity(String annotedText)
-	{		
-//		this.sentencesLinear = getAnnotedTextOnlyLinear(annotedText);
-		this.sentencesParallel = getAnnotedTextOnlyParallel(annotedText);
+	{
+//		System.out.println("AE CALL");
 		
+		this.sentences = getAnnotedTextOnly(annotedText);
 		
-		for (int i = 0; i < getSentencesLinear().size(); i++) 
+		for (int i = 0; i < getSentences().size(); i++) 
 		{
-			getAnnotationsAndUrls(getSentencesLinear().get(i), annotedObjects);
+			getAnnotationsAndUrls(getSentences().get(i), annotedObjects);
 		}
 	}
 	
@@ -46,173 +44,29 @@ public class AnnotatedEntity
 	//############################################################################################
 	//############################################################################################
 	
-	/**
-	 * This class is used for the gathering of text annotation from given "Wikipedia dump file" [Parallel]
-	 * and the generation of there corresponding url's  
-	 * @author T.Turke
-	 */
-	public List<String> getAnnotedTextOnlyParallel(String text)
+	public List<String> getAnnotedTextOnly(String text)
 	{
-		// Regex multiline reference 	=> http://www.rexegg.com/regex-quickstart.html
-		// MARKUP reference 			=> https://en.wikipedia.org/wiki/Help:Wiki_markup
-		
-		List<String> firstStepOut = new ArrayList<String>(); 
 		List<String> content = new ArrayList<String>();
-		List<String> rexBib = new ArrayList<String>();
-		int[] wantedRexes = new int[6];
-//		boolean isRex = false; 
-//		String line;
-		
-		
-		//Necessary regular expressions
-		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";		rexBib.add(regexUri);
-		String testReg2 = "^[a-zA-Z0-9_.|]*\\[\\]";																	rexBib.add(testReg2);
-		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");									rexBib.add(regexHeader);
-		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");										rexBib.add(regexGK);
-		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");									rexBib.add(regexRef);
-		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");									rexBib.add(regSpecRef);
-		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";		rexBib.add(finalRex);
-		
-		wantedRexes[0] = 1;	// regexUri
-		wantedRexes[1] = 2;	// testReg2
-		wantedRexes[2] = 3;	// regexHeader
-		wantedRexes[3] = 4;	// regexGK
-		wantedRexes[4] = 5;	// regexRef
-		wantedRexes[5] = 6;	// regSpecRef
-		
-		List<String> sentences = Arrays.asList(text.split("\n"));		
-		
-		if(sentences.size() > 10)
-		{
-			
-			IntStream.range(0, sentences.size()).parallel().forEach(id -> 
-			{
-                try 
-                {
-                	boolean isRex = false;
-                	String subSentence = sentences.get(id).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
-    				Appendings ape = null;
-    				
-    				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
-    				iterator.setText(subSentence);
-    				int start = iterator.first();
-    				
-    				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
-    				{
-    					String line = subSentence.substring(start,end).replaceAll(regexUri, "").replaceAll("'", "");
-    					
-    					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
-    						{
-    							if(line.contains("{{"))
-    							{
-    								isRex = true;
-    								ape = new Appendings("{{","}}");
-    								ape.appending(line);
-    							}
-    							
-    							if(line.contains("<ref"))
-    							{
-    								isRex = true;
-    								ape = new Appendings("<ref","</ref>");
-    								ape.appending(line);
-    							}
-    							
-    							if(isRex && ape != null)
-    							{
-    								if(line.contains("</ref>") || line.contains("}}") || line.contains("/>"))
-    								{
-    									ape.appending(line);
-    									
-    									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
-    									{
-    										content.add(specificRegEx(ape.getAppendings(), rexBib, wantedRexes));
-    									}
-    									
-    									isRex = false;
-    									
-    								}else{
-    									ape.appending(line);
-    								}
-    							}
-    							
-    						}else{
-    							
-    							if(line.indexOf("*") != 0 && line.contains("[[") && line.contains("]]") && line.contains(".")&& !line.contains("[[File:") && !line.contains("[[Image:"))
-    							{
-    								content.add(specificRegEx(line, rexBib, wantedRexes));
-    							}
-    							
-    							
-    						}
-    				}
-    				
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-			
-			
-			//Final collecting "parallel"
-			IntStream.range(0, content.size()).parallel().forEach(id -> 
-			{
-                try {
-                	
-                	if(finalRex != null && content.get(id) != null)
-                	{
-                		Pattern pat = Pattern.compile(finalRex);	
-        				Matcher m = pat.matcher(content.get(id));
-
-        				while(m.find())
-        				{
-//        					System.out.println(m.group(0));
-        					firstStepOut.add(m.group(0));
-        				}
-                	}
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-			
-		}
-		
-		return firstStepOut;
-	}
-	
-	//############################################################################################
-	//############################################################################################
-	//############################################################################################
-	
-	public List<String> getAnnotedTextOnlyLinear(String text)
-	{
-		// Regex multiline reference 	=> http://www.rexegg.com/regex-quickstart.html
-		// MARKUP reference 			=> https://en.wikipedia.org/wiki/Help:Wiki_markup
-		
 		List<String> firstStepOut = new ArrayList<String>(); 
-		List<String> content = new ArrayList<String>();
-		List<String> rexBib = new ArrayList<String>();
-		int[] wantedRexes = new int[6];
-		boolean isRex = false; 
 		String line;
+		boolean isRex = false; 
 		
-		long start_millis = System.currentTimeMillis() % 1000;
-		long end_millis;
+		//TODO Regex start end reference tags over multiple lines => http://www.rexegg.com/regex-quickstart.html
+		//TODO Wichtig MARKUP -> https://en.wikipedia.org/wiki/Help:Wiki_markup
 		
 		
-		//Necessary regular expressions
-		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";		rexBib.add(regexUri);
-		String testReg2 = "^[a-zA-Z0-9_.|]*\\[\\]";																	rexBib.add(testReg2);
-		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");									rexBib.add(regexHeader);
-		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");										rexBib.add(regexGK);
-		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");									rexBib.add(regexRef);
-		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");									rexBib.add(regSpecRef);
-		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";		rexBib.add(finalRex);
+//		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
+		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 		
-		wantedRexes[0] = 1;	// regexUri
-		wantedRexes[1] = 2;	// testReg2
-		wantedRexes[2] = 3;	// regexHeader
-		wantedRexes[3] = 4;	// regexGK
-		wantedRexes[4] = 5;	// regexRef
-		wantedRexes[5] = 6;	// regSpecRef
+//		String testReg1 = "^[a-zA-Z0-9_.]*"+Pattern.quote("[[")+"(.*?)"+Pattern.quote("]]")+"[a-zA-Z0-9_.]*";
+		String testReg2 = "^[a-zA-Z0-9_.|]*\\[\\]";
+		
+		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
+		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
+		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");
+		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";
+
 		
 		List<String> sentences = Arrays.asList(text.split("\n"));		
 		
@@ -257,8 +111,7 @@ public class AnnotatedEntity
 									
 									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
 									{
-//										content.add(ape.getAppendings().replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, ""));
-										content.add(specificRegEx(ape.getAppendings(), rexBib, wantedRexes));
+										content.add(ape.getAppendings().replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, ""));
 									}
 									
 									isRex = false;
@@ -272,9 +125,8 @@ public class AnnotatedEntity
 							
 							if(line.indexOf("*") != 0 && line.contains("[[") && line.contains("]]") && line.contains(".")&& !line.contains("[[File:") && !line.contains("[[Image:"))
 							{
-//								line.replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, "");
-//								content.add(line);
-								content.add(specificRegEx(line, rexBib, wantedRexes));
+								line.replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, "");
+								content.add(line);
 							}
 							
 							
@@ -294,38 +146,11 @@ public class AnnotatedEntity
 				}
 			}
 			
+//			System.out.println("DONE [content size : "+firstStepOut.size()+"]");
+			
 		}
-		
-		end_millis = System.currentTimeMillis() % 1000;
-		System.out.println("Processing Time: "+(end_millis-start_millis));
-		System.out.println("Content Size: "+firstStepOut.size());
 		
 		return firstStepOut;
-	}
-	
-	//############################################################################################
-	//############################################################################################
-	//############################################################################################
-	
-	/**
-	 * This method just wrap a long replacement call
-	 * @param input
-	 * @param rexBib
-	 * @param wantedRexes
-	 * @return regEx cleaned String
-	 */
-	public String specificRegEx(String input, List<String> rexBib, int[] wantedRexes)
-	{
-		String replacement = "";
-		
-		for (int i = 0; i < wantedRexes.length; i++) 
-		{
-//			System.out.println("Rex: "+rexBib.get(wantedRexes[i]-1));
-			input.replaceAll(rexBib.get(wantedRexes[i]), replacement);
-		}
-		
-		input.replaceAll("´", "'").replaceAll("`", "'");
-		return input;
 	}
 	
 	//############################################################################################
@@ -387,20 +212,12 @@ public class AnnotatedEntity
 		this.annotedObjects = annotedObjects;
 	}
 
-	public List<String> getSentencesLinear() {
-		return sentencesLinear;
+	public List<String> getSentences() {
+		return sentences;
 	}
 
-	public void setSentencesLinear(List<String> sentences) {
-		this.sentencesLinear = sentences;
-	}
-
-	public List<String> getSentencesParallel() {
-		return sentencesParallel;
-	}
-
-	public void setSentencesParallel(List<String> sentences) {
-		this.sentencesParallel = sentences;
+	public void setSentences(List<String> sentences) {
+		this.sentences = sentences;
 	}
 	
 	

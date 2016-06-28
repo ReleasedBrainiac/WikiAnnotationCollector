@@ -30,9 +30,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	private static String text = null;
 	private static boolean isTextTag =false;
 	public static int run = 0;
-	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-	public static Calendar cal = Calendar.getInstance();
 	
 
 	/**
@@ -61,7 +59,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 			case "text":
 			{
 				anotEnts.add(new AnnotatedEntity(text));
-				if(run % 1000 == 0)
+				if(run % 500 == 0)
 				{
 					runAndTime(run);
 				}
@@ -88,8 +86,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	 */
 	public void runAndTime(int run)
 	{		
-		
-		System.out.println("Run Nr.: "+run+" and Time: "+dateFormat.format(cal.getTime()));
+		System.out.println("Run Nr.: "+run+" and Time: "+dateFormat.format(Calendar.getInstance().getTime()));
 	}
 
 	/**
@@ -101,7 +98,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	 */
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException 
 	{
-		final Date START_TIME = cal.getTime();
+		final Date START_TIME = Calendar.getInstance().getTime();
 		System.out.println("Start: "+START_TIME);
 		System.out.println("Desired elements = 19875");
 		
@@ -131,7 +128,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 		//save content to it
 		new StoringContent(fileName, rootElement, anotEnts);
 		
-		final Date END_TIME = cal.getTime();
+		final Date END_TIME = Calendar.getInstance().getTime();
 		System.out.println("End: "+END_TIME);
 		
 		System.out.println("Time needed: "+(END_TIME.getTime()-START_TIME.getTime()));

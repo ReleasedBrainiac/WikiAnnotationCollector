@@ -59,7 +59,6 @@ public class StoringContent
 	        // create the root element
 	        Element rootElem = dom.createElement(rootElement);
 	        
-	        
 	        for(int i = 0; i < aeList.size(); i++)
 	        {
 	        	
@@ -105,7 +104,6 @@ public class StoringContent
 	            tr.setOutputProperty(OutputKeys.INDENT, "yes");
 	            tr.setOutputProperty(OutputKeys.METHOD, "xml");
 	            tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-//	            tr.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "roles.dtd");
 	            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
 	            // send DOM to file

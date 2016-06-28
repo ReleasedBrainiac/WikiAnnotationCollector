@@ -7,22 +7,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 /**
  * This class is used for the gathering of text annotation from given "Wikipedia dump file" 
+ * [semi parallel]
  * and the generation of there corresponding url's  
- * [linear]
  * @author T.Turke
  */
-public class AnnotatedEntity 
+public class AnnotedEntitySemiParallel 
 {
 	private List<AnnotObject> annotedObjects = new ArrayList<AnnotObject>();
-	private List<String> sentences = new ArrayList<String>();
+	private List<String> sentencesLinear = new ArrayList<String>();
+	private List<String> sentencesParallel = new ArrayList<String>();
 	
 	/**
 	 * Initials constructor no parameters
 	 */
-	public AnnotatedEntity(){}
+	public AnnotedEntitySemiParallel(){}
 	
 	//############################################################################################
 	//############################################################################################
@@ -33,14 +35,23 @@ public class AnnotatedEntity
 	 * annotations and the creation of there corresponding url's.
 	 * @param annotedText
 	 */
-	public AnnotatedEntity(String annotedText)
+	public AnnotedEntitySemiParallel(String annotedText)
 	{		
-		this.sentences = getAnnotedTextOnlyLinear(annotedText);
+		this.sentencesLinear = getAnnotedTextOnlyParallel(annotedText);
 		
-		for (int i = 0; i < getSentences().size(); i++) 
+		IntStream.range(0, getSentencesLinear().size()).parallel().forEach(pos -> 
 		{
-			getAnnotationsAndUrls(getSentences().get(i), annotedObjects);
-		}
+			synchronized (this) 
+			{
+				try
+				{
+					getAnnotationsAndUrls(getSentencesLinear().get(pos), annotedObjects);
+                	
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+			}
+        });	
 	}
 	
 	//############################################################################################
@@ -52,29 +63,29 @@ public class AnnotatedEntity
 	 * @param text
 	 * @return list of annotated sentences
 	 */
-	public List<String> getAnnotedTextOnlyLinear(String text)
+	public List<String> getAnnotedTextOnlyParallel(String text)
 	{
-		List<String> content = new ArrayList<String>();
+		// Regex multiline reference 	=> http://www.rexegg.com/regex-quickstart.html
+		// MARKUP reference 			=> https://en.wikipedia.org/wiki/Help:Wiki_markup
+		
+		List<String> sentences = Arrays.asList(text.split("\n"));
 		List<String> firstStepOut = new ArrayList<String>(); 
-		boolean isRex = false;
+		List<String> content = new ArrayList<String>();
+		boolean isRex = false; 
 		String line;
 		
-		// Regex over multiple lines 		=> http://www.rexegg.com/regex-quickstart.html
-		// Wikipedia MARKUP 				=> https://en.wikipedia.org/wiki/Help:Wiki_markup
-		
-		
-		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-		String testReg2 = "^[a-zA-Z0-9_.|]*\\[\\]";
+		//Necessary regular expressions
+		String regexUri = "\\b(http?|https|Image|File)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";		
+		String testReg2 = "^[a-zA-Z0-9_.|]*\\[\\]";																	
 		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
 		String regexRK = Pattern.quote("(") + "(.*?)" + Pattern.quote(")");
-		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");
-		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
-		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");
-		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";
+		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");										
+		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");									
+		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");									
+		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";		
 
-		
-		List<String> sentences = Arrays.asList(text.split("\n"));		
-		
+
+		//Starting the collecting
 		if(sentences.size() > 10)
 		{
 			for(int k = 0; k < sentences.size(); k++)
@@ -90,7 +101,7 @@ public class AnnotatedEntity
 				{
 					line = subSentence.substring(start,end).replaceAll(regexUri, "").replaceAll("'", "");
 					
-						if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
+					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
 						{
 							if(line.contains("{{"))
 							{
@@ -109,16 +120,16 @@ public class AnnotatedEntity
 							if(isRex && ape != null)
 							{
 								if(line.contains("</ref>") || line.contains("}}") || line.contains("/>"))
-								{
-									//TODO beim bereinigen den regEx ersetzen falls der endTag anders ist bei der REF!
-									
+								{									
 									ape.appending(line);
 									
 									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
 									{
 										String newContent = ape.getAppendings().replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, "").replaceAll(regexRK, "");
 										if(newContent.length() > 0 && newContent != null && !newContent.contains("*") && newContent.contains("[[") && newContent.contains("]]") && newContent.contains(".")) content.add(newContent);
+
 									}
+									
 									isRex = false;
 									
 								}else{
@@ -132,21 +143,39 @@ public class AnnotatedEntity
 							{
 								line.replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, "").replaceAll(regexRK, "");
 								if(line.length() > 0 && line != null) content.add(line);	
-							}	
+							}
 						}
-					}
-			}
-			
-			for(String str : content)
-			{
-				Pattern pat = Pattern.compile(finalRex);	
-				Matcher m = pat.matcher(str);
-
-				while(m.find())
-				{
-					if(m.group(0) != null && m.group(0).length() > 0) firstStepOut.add(m.group(0));
 				}
 			}
+			
+			
+			IntStream.range(0, content.size()).parallel().forEach(id -> 
+			{
+				synchronized (this) 
+				{
+					try
+					{
+	                	
+	                	if(content.get(id) != null)
+	                	{
+	                		Pattern pat = Pattern.compile(finalRex);	
+	        				Matcher m = pat.matcher(content.get(id));
+
+	        				synchronized (this) 
+	    					{
+	        					while(m.find())
+	            				{
+	        						if(m.group(0) != null && m.group(0).length() > 0) firstStepOut.add(m.group(0));	
+	            				}
+	    					}
+	                	}else{
+	                		System.out.println("Empty: "+content.get(id));
+	                	}
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+				}
+            });			
 		}
 		return firstStepOut;
 	}
@@ -167,35 +196,39 @@ public class AnnotatedEntity
 		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
 		List<String> correspondingURLs2 = new ArrayList<String>();		
 		
-		Pattern pat = Pattern.compile(regexStr);	
-		Matcher m = pat.matcher(sentence);
-		
-		//Die Suche nach den Annotations und die Generation der Urls
-		while(m.find())
+		if(sentence != null)
 		{
-			 String annotation = m.group(1);
-			 String[] tmp;
-			 correspondingURLs2 = new ArrayList<String>();
-			 
-			 if(annotation.contains("|"))
-			 {
-				 tmp = annotation.split("\\|");
+			Pattern pat = Pattern.compile(regexStr);	
+			Matcher m = pat.matcher(sentence);
+			
+			//Die Suche nach den Annotations und die Generation der Urls
+			while(m.find())
+			{
+				 String annotation = m.group(1);
+				 String[] tmp;
+				 correspondingURLs2 = new ArrayList<String>();
 				 
-				 for(String annot : tmp){
-					 if(!annot.contains(" "))
-					 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot);}
-					 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot.replace(" ", "_"));}  
-				 }
+				 if(annotation.contains("|"))
+				 {
+					 tmp = annotation.split("\\|");
+					 
+					 for(String annot : tmp){
+						 if(!annot.contains(" "))
+						 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot);}
+						 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot.replace(" ", "_"));}  
+					 }
 
-			 }else{
+				 }else{
+					 
+					 if(!annotation.contains(" "))
+					 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation);}
+					 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation.replace(" ", "_"));} 
+				 } 
 				 
-				 if(!annotation.contains(" "))
-				 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation);}
-				 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation.replace(" ", "_"));} 
-			 } 
-			 
-			 annotedObjects.add(new AnnotObject(sentence, annotation, correspondingURLs2)); 
+				 annotedObjects.add(new AnnotObject(sentence, annotation, correspondingURLs2)); 
+			}
 		}
+		
 	}
 	
 	//############################################################################################
@@ -210,13 +243,22 @@ public class AnnotatedEntity
 		this.annotedObjects = annotedObjects;
 	}
 
-	public List<String> getSentences() {
-		return sentences;
+	public List<String> getSentencesLinear() {
+		return sentencesLinear;
 	}
 
-	public void setSentences(List<String> sentences) {
-		this.sentences = sentences;
+	public void setSentencesLinear(List<String> sentences) {
+		this.sentencesLinear = sentences;
+	}
+
+	public List<String> getSentencesParallel() {
+		return sentencesParallel;
+	}
+
+	public void setSentencesParallel(List<String> sentences) {
+		this.sentencesParallel = sentences;
 	}
 	
 	
 }
+

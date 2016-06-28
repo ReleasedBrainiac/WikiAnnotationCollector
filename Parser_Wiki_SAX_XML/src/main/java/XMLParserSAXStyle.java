@@ -9,7 +9,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -27,12 +26,14 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XMLParserSAXStyle extends DefaultHandler 
 {
 	private static List<AnnotatedEntity> anotEnts = new ArrayList<AnnotatedEntity>();
-	private static String text = null;
-	private static boolean isTextTag =false;
-	public static int run = 0;
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+	private boolean isParallel = false;
+	private static boolean isTextTag =false;
+	private static String text = null;
+	public static int reportUpdate = 500;
+	public static int run = 0;
 	
-
+	
 	/**
 	 * Override: Now check existence of the tag your searching for.
 	 */
@@ -46,6 +47,10 @@ public class XMLParserSAXStyle extends DefaultHandler
 			run++;
 		}
 	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
 
 	/**
 	 * Override: Now you got the text now go ahead and use it
@@ -58,14 +63,24 @@ public class XMLParserSAXStyle extends DefaultHandler
 		{
 			case "text":
 			{
-				anotEnts.add(new AnnotatedEntity(text));
-				if(run % 500 == 0)
+				if(isParallel)
+				{
+					anotEnts.add(new AnnotatedEntity(text));	//semi parallel
+				}else{
+					anotEnts.add(new AnnotatedEntity(text));	//linear
+				}
+
+				if(run % reportUpdate == 0)
 				{
 					runAndTime(run);
 				}
 			}	
 		}
 	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
 
 	/**
 	 * Override: Now do text abstraction and generation.
@@ -77,18 +92,50 @@ public class XMLParserSAXStyle extends DefaultHandler
 		{	
 			text += new String(ch, start, length);
 		}
-		
 	}
 	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
 	/**
-	 * For performance testing
-	 * @param run
+	 * Report Update
+	 * @param current desired node
 	 */
 	public void runAndTime(int run)
 	{		
 		System.out.println("Run Nr.: "+run+" and Time: "+dateFormat.format(Calendar.getInstance().getTime()));
 	}
-
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
+	/**
+	 * This set process state [linear or parallel] depending on the boolean.
+	 * DEFAULT linear = false
+	 * MODIFIED parallel = true 
+	 * @param isParallel
+	 */
+	@SuppressWarnings("static-access")
+	public void setProcessState(boolean isParallel)
+	{
+		this.isParallel = isParallel;
+	}
+	
+	/**
+	 * This return process state.
+	 * @return DEFAULT linear = false OR MODIFIED parallel = true 
+	 */
+	public boolean getProcessState()
+	{
+		return isParallel;
+	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
 	/**
 	 * Central Main-method for the tool.
 	 * @param args
@@ -98,12 +145,11 @@ public class XMLParserSAXStyle extends DefaultHandler
 	 */
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException 
 	{
-		final Date START_TIME = Calendar.getInstance().getTime();
-		System.out.println("Start: "+START_TIME);
-		System.out.println("Desired elements = 19875");
+		System.out.println("START: "+Calendar.getInstance().getTime());
 		
 		//String path = args[0];
 		String path = "C:/Users/Tobia/Desktop/Texteressourcen für Arbeit/enwiki-latest-pages-articles1.xml";
+		boolean isParallel = true;
 		
 		//For UTF-8 Setup
 		File file = new File(path);
@@ -116,24 +162,28 @@ public class XMLParserSAXStyle extends DefaultHandler
 		SAXParserFactory parserFactor = SAXParserFactory.newInstance();
 		SAXParser parser = parserFactor.newSAXParser();
 		XMLParserSAXStyle handler = new XMLParserSAXStyle();
+		handler.setProcessState(isParallel);
+		handler.reportUpdate = 1000;
 		parser.parse(is, handler);
 		
-//		String fileName = "en-wiki-annotations-and-depencies.xml";	// = args[1] //is also a possible option to implement.
-		String fileName = "en-wiki-annotations-and-depencies-parallel.xml";	// = args[1] //is also a possible option to implement.
-		String rootElement = "wikiAnnotations";						// = args[2] //is also a possible option to implement.
+		//Dateien- und Dom-Bezeichner festlegen
 		
-		//generate xml file
-		new FileGenerator(fileName);
+		String fileName = null;
+		String rootElement = "wikiAnnotations";										// = args[2] //is also a possible option to implement.
 		
-		//save content to it
-		new StoringContent(fileName, rootElement, anotEnts);
+		if(isParallel)
+		{
+			fileName = "en-wiki-annotations-and-depencies-parallel.xml";		// = args[1] //is also a possible option to implement.
+			new FileGenerator(fileName);
+			new StoringContentSemiParallel(fileName, rootElement, anotEnts);
+		}else{
+			fileName = "en-wiki-annotations-and-depencies.xml";				// = args[1] //is also a possible option to implement.
+			new FileGenerator(fileName);
+			new StoringContent(fileName, rootElement, anotEnts);
+		}
+
 		
-		final Date END_TIME = Calendar.getInstance().getTime();
-		System.out.println("End: "+END_TIME);
-		
-		System.out.println("Time needed: "+(END_TIME.getTime()-START_TIME.getTime()));
-		System.out.println("Items: "+run);
-		
-		
+		System.out.println("END: "+Calendar.getInstance().getTime());
+		System.out.println("Proceeded Elements: "+run);	
 	}
 }

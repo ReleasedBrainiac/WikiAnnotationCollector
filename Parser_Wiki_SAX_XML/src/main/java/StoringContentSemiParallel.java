@@ -2,6 +2,7 @@ package main.java;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,21 +18,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * This class stores the gathered annotations from "enwiki.~ ~.xml" file and save them to another structured XML file.
- * [linear]
+ * This class stores the gathered annotations from "enwiki.~ ~.xml" file and save them to another structured XML file. 
+ * [semi parallelized]
  * @author T.Turke
  *
  */
-public class StoringContent 
+public class StoringContentSemiParallel 
 {
 	/**
-	 * Constructor initialize the content storing process.
-	 * [linear]
+	 * Constructor initialize the content storing process. 
+	 * [semi parallel]
 	 * @param pathXML
 	 * @param rootElement
 	 * @param aeList
 	 */
-	public StoringContent(String pathXML, String rootElement, List<AnnotatedEntity> aeList)
+	public StoringContentSemiParallel(String pathXML, String rootElement, List<AnnotatedEntity> aeList)
 	{
 		System.out.println("Storing Content!");
 		saveToXML(pathXML, rootElement, aeList);
@@ -43,7 +44,7 @@ public class StoringContent
 	
 	/**
 	 * This method construct and fill XML + Domain and finally save the stuff.
-	 * [linear]
+	 * [semi parallel]
 	 * @param pathXML
 	 * @param rootElement
 	 * @param aeList
@@ -51,10 +52,6 @@ public class StoringContent
 	public void saveToXML(String pathXML, String rootElement, List<AnnotatedEntity> aeList) 
 	{
 	    Document dom;
-	    Element objectElem = null;
-	    Element sentenceElem = null;
-	    Element wordElem = null;
-	    Element subElem = null;
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    
 	    try {
@@ -66,43 +63,54 @@ public class StoringContent
 	        // create the root element
 	        Element rootElem = dom.createElement(rootElement);
 	        
-	        for(int i = 0; i < aeList.size(); i++)
-	        {
-	        	
-	        	//Node for text
-	        	AnnotatedEntity curAnnotEnt = aeList.get(i);
-	        	
-	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
-	        	{        	
-			        
-			        //Node for annotaions
-			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
-			        for(int j = 0; j < aoList.size(); j++)
-			        {
-			        	objectElem = dom.createElement("AnnotationNotification");
-				        rootElem.appendChild(objectElem);
-				        
-			        	AnnotObject ao = aoList.get(j);
-			        	
-			        	sentenceElem  = dom.createElement("Sentence");
-			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
-			        	objectElem.appendChild(sentenceElem);
-			        	
-			        	wordElem = dom.createElement("Annotation");
-			        	wordElem.appendChild(dom.createTextNode(ao.getAnnotedWord()));
-			        	objectElem.appendChild(wordElem);
-			       
-				        List<String> urls = ao.getCorrespondingURLs();
-				        for(int k = 0; k < ao.getCorrespondingURLs().size(); k++)
-				        {
-				        	//Subnode for annotaions corresponding urls
-			        		subElem = dom.createElement("Url");
-			        		subElem.appendChild(dom.createTextNode(urls.get(k)));
-			        		objectElem.appendChild(subElem);
-				        }  
-			        }
-	        	}
-	        }
+	        IntStream.range(0, aeList.size()).parallel().forEach(id -> 
+			{
+				synchronized (this) 
+				{
+					try 
+	                {
+	                	
+	                	//Node for text
+	    	        	AnnotatedEntity curAnnotEnt = aeList.get(id);
+	    	        	
+	    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
+	    	        	{        	
+	    			        
+	    			        //Node for annotaions
+	    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
+	    			        for(int j = 0; j < aoList.size(); j++)
+	    			        {
+	    			        	Element objectElem = dom.createElement("AnnotationNotification");
+	    				        rootElem.appendChild(objectElem);
+	    				        
+	    			        	AnnotObject ao = aoList.get(j);
+	    			        	
+	    			        	Element sentenceElem  = dom.createElement("Sentence");
+	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+	    			        	objectElem.appendChild(sentenceElem);
+	    			        	
+	    			        	Element wordElem = dom.createElement("Annotation");
+	    			        	wordElem.appendChild(dom.createTextNode(ao.getAnnotedWord()));
+	    			        	objectElem.appendChild(wordElem);
+	    			       
+	    				        List<String> urls = ao.getCorrespondingURLs();
+	    				        for(int k = 0; k < ao.getCorrespondingURLs().size(); k++)
+	    				        {
+	    				        	//Subnode for annotaions corresponding urls
+	    			        		Element subElem = dom.createElement("Url");
+	    			        		subElem.appendChild(dom.createTextNode(urls.get(k)));
+	    			        		objectElem.appendChild(subElem);
+	    				        }  
+	    			        }
+	    	        	}
+	                	
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+				}
+				
+                
+            });
 
 	        dom.appendChild(rootElem);
 

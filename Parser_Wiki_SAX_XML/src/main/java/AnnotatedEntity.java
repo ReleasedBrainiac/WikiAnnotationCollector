@@ -31,10 +31,8 @@ public class AnnotatedEntity
 	 * @param annotedText
 	 */
 	public AnnotatedEntity(String annotedText)
-	{
-//		System.out.println("AE CALL");
-		
-		this.sentencesLinear = getAnnotedTextOnlyLinear(annotedText);
+	{		
+//		this.sentencesLinear = getAnnotedTextOnlyLinear(annotedText);
 		this.sentencesParallel = getAnnotedTextOnlyParallel(annotedText);
 		
 		
@@ -62,11 +60,8 @@ public class AnnotatedEntity
 		List<String> content = new ArrayList<String>();
 		List<String> rexBib = new ArrayList<String>();
 		int[] wantedRexes = new int[6];
-		boolean isRex = false; 
-		String line;
-		
-		long start_millis = System.currentTimeMillis() % 1000;
-		long end_millis;
+//		boolean isRex = false; 
+//		String line;
 		
 		
 		//Necessary regular expressions
@@ -89,94 +84,66 @@ public class AnnotatedEntity
 		
 		if(sentences.size() > 10)
 		{
-			for(int k = 0; k < sentences.size(); k++)
-			{
-				String subSentence = sentences.get(k).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
-				Appendings ape = null;
-				
-				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
-				iterator.setText(subSentence);
-				int start = iterator.first();
-				
-				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
-				{
-					line = subSentence.substring(start,end).replaceAll(regexUri, "").replaceAll("'", "");
-					
-					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
-						{
-							if(line.contains("{{"))
-							{
-								isRex = true;
-								ape = new Appendings("{{","}}");
-								ape.appending(line);
-							}
-							
-							if(line.contains("<ref"))
-							{
-								isRex = true;
-								ape = new Appendings("<ref","</ref>");
-								ape.appending(line);
-							}
-							
-							if(isRex && ape != null)
-							{
-								if(line.contains("</ref>") || line.contains("}}") || line.contains("/>"))
-								{
-									//TODO beim bereinigen den regEx ersetzen falls der endTag anders ist bei der REF!
-									
-									ape.appending(line);
-									
-									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
-									{
-//										content.add(ape.getAppendings().replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, ""));
-										content.add(specificRegEx(ape.getAppendings(), rexBib, wantedRexes));
-									}
-									
-									isRex = false;
-									
-								}else{
-									ape.appending(line);
-								}
-							}
-							
-						}else{
-							
-							if(line.indexOf("*") != 0 && line.contains("[[") && line.contains("]]") && line.contains(".")&& !line.contains("[[File:") && !line.contains("[[Image:"))
-							{
-//								line.replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "").replaceAll(regexUri, "").replaceAll(regSpecRef, "").replaceAll("´", "'").replaceAll("`", "'").replaceAll(testReg2, "");
-//								content.add(line);
-								content.add(specificRegEx(line, rexBib, wantedRexes));
-							}
-							
-							
-						}
-				}
-			}
 			
-			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-			
-			IntStream.range(0, content.size()).parallel().forEach(id -> 
+			IntStream.range(0, sentences.size()).parallel().forEach(id -> 
 			{
-                try {
-                	
+                try 
+                {
+                	boolean isRex = false;
+                	String subSentence = sentences.get(id).replaceAll(regexGK, "").replaceAll(regexRef, "").replaceAll(regexHeader, "");
+    				Appendings ape = null;
     				
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-			
-			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-			
-			IntStream.range(0, content.size()).parallel().forEach(id -> 
-			{
-                try {
-                	Pattern pat = Pattern.compile(finalRex);	
-    				Matcher m = pat.matcher(content.get(id));
-
-    				while(m.find())
+    				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+    				iterator.setText(subSentence);
+    				int start = iterator.first();
+    				
+    				for (int end = iterator.next();end != BreakIterator.DONE;start = end, end = iterator.next()) 
     				{
-    					System.out.println(m.group(0));
-    					firstStepOut.add(m.group(0));
+    					String line = subSentence.substring(start,end).replaceAll(regexUri, "").replaceAll("'", "");
+    					
+    					if(isRex || line.contains("</ref>") || line.contains("<ref") || line.contains("{{") || line.contains("}}"))
+    						{
+    							if(line.contains("{{"))
+    							{
+    								isRex = true;
+    								ape = new Appendings("{{","}}");
+    								ape.appending(line);
+    							}
+    							
+    							if(line.contains("<ref"))
+    							{
+    								isRex = true;
+    								ape = new Appendings("<ref","</ref>");
+    								ape.appending(line);
+    							}
+    							
+    							if(isRex && ape != null)
+    							{
+    								if(line.contains("</ref>") || line.contains("}}") || line.contains("/>"))
+    								{
+    									ape.appending(line);
+    									
+    									if(ape.getAppendings().contains("[[") && ape.getAppendings().contains("]]") && ape.getAppendings().contains(".") && !ape.getAppendings().contains("[[File:") && !ape.getAppendings().contains("[[Image:"))
+    									{
+    										content.add(specificRegEx(ape.getAppendings(), rexBib, wantedRexes));
+    									}
+    									
+    									isRex = false;
+    									
+    								}else{
+    									ape.appending(line);
+    								}
+    							}
+    							
+    						}else{
+    							
+    							if(line.indexOf("*") != 0 && line.contains("[[") && line.contains("]]") && line.contains(".")&& !line.contains("[[File:") && !line.contains("[[Image:"))
+    							{
+    								content.add(specificRegEx(line, rexBib, wantedRexes));
+    							}
+    							
+    							
+    						}
     				}
     				
                 } catch (Exception e) {
@@ -185,23 +152,28 @@ public class AnnotatedEntity
             });
 			
 			
-//			for(String str : content)
-//			{
-//				Pattern pat = Pattern.compile(finalRex);	
-//				Matcher m = pat.matcher(str);
-//
-//				while(m.find())
-//				{
-////					System.out.println(m.group(0));
-//					firstStepOut.add(m.group(0));
-//				}
-//			}
+			//Final collecting "parallel"
+			IntStream.range(0, content.size()).parallel().forEach(id -> 
+			{
+                try {
+                	
+                	if(finalRex != null && content.get(id) != null)
+                	{
+                		Pattern pat = Pattern.compile(finalRex);	
+        				Matcher m = pat.matcher(content.get(id));
+
+        				while(m.find())
+        				{
+//        					System.out.println(m.group(0));
+        					firstStepOut.add(m.group(0));
+        				}
+                	}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
 			
 		}
-		
-		end_millis = System.currentTimeMillis() % 1000;
-		System.out.println("Processing Time: "+(end_millis-start_millis));
-		System.out.println("Content Size: "+firstStepOut.size());
 		
 		return firstStepOut;
 	}
@@ -348,7 +320,7 @@ public class AnnotatedEntity
 		
 		for (int i = 0; i < wantedRexes.length; i++) 
 		{
-			System.out.println("Rex: "+rexBib.get(wantedRexes[i]-1));
+//			System.out.println("Rex: "+rexBib.get(wantedRexes[i]-1));
 			input.replaceAll(rexBib.get(wantedRexes[i]), replacement);
 		}
 		

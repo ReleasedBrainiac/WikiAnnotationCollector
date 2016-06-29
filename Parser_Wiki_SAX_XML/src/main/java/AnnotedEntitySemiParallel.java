@@ -194,7 +194,8 @@ public class AnnotedEntitySemiParallel
 	public void getAnnotationsAndUrls(String sentence, List<AnnotObject> annotedObjects)
 	{
 		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-		List<String> correspondingURLs2 = new ArrayList<String>();		
+		List<String> correspondingURLs2 = new ArrayList<String>();
+		List<String> annotations = new ArrayList<String>();	
 		
 		if(sentence != null)
 		{
@@ -204,9 +205,13 @@ public class AnnotedEntitySemiParallel
 			//Die Suche nach den Annotations und die Generation der Urls
 			while(m.find())
 			{
-				 String annotation = m.group(1);
-				 String[] tmp;
-				 correspondingURLs2 = new ArrayList<String>();
+				String annotation = m.group(1);
+				annotations.add(annotation);
+				
+				String[] tmp;
+				correspondingURLs2 = new ArrayList<String>();
+				 
+				 
 				 
 				 if(annotation.contains("|"))
 				 {
@@ -224,9 +229,8 @@ public class AnnotedEntitySemiParallel
 					 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation);}
 					 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation.replace(" ", "_"));} 
 				 } 
-				 
-				 annotedObjects.add(new AnnotObject(sentence, annotation, correspondingURLs2)); 
 			}
+			annotedObjects.add(new AnnotObject(sentence, annotations, correspondingURLs2)); 
 		}
 		
 	}

@@ -89,18 +89,24 @@ public class StoringContentSemiParallel
 	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
 	    			        	objectElem.appendChild(sentenceElem);
 	    			        	
-	    			        	Element wordElem = dom.createElement("Annotation");
-	    			        	wordElem.appendChild(dom.createTextNode(ao.getAnnotedWord()));
-	    			        	objectElem.appendChild(wordElem);
+	    			        	List<String> annots = ao.getAnnotedWords();
+	    			        	Element wordElem = null;
+	    				        for(int k = 0; k < annots.size(); k++)
+	    				        {				        	
+	    				        	wordElem = dom.createElement("Annotation");
+	    				        	wordElem.appendChild(dom.createTextNode(annots.get(k)));
+	    				        	objectElem.appendChild(wordElem);
+	    				        } 
 	    			       
 	    				        List<String> urls = ao.getCorrespondingURLs();
-	    				        for(int k = 0; k < ao.getCorrespondingURLs().size(); k++)
+	    				        Element subElem = null;
+	    				        for(int k = 0; k < urls.size(); k++)
 	    				        {
 	    				        	//Subnode for annotaions corresponding urls
-	    			        		Element subElem = dom.createElement("Url");
+	    			        		subElem = dom.createElement("Url");
 	    			        		subElem.appendChild(dom.createTextNode(urls.get(k)));
 	    			        		objectElem.appendChild(subElem);
-	    				        }  
+	    				        } 
 	    			        }
 	    	        	}
 	                	

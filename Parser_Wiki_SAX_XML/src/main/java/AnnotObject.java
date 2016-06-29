@@ -10,44 +10,28 @@ import java.util.List;
  */
 public class AnnotObject
 {
-	private String annotedWord;
 	private String annotedSentence;
+	private List<String> annotedWords;
 	private List<String> correspondingURLs = new ArrayList<String>();
 	
-	
-	public AnnotObject(String annotedSentence)
-	{
-		this.annotedSentence = annotedSentence;
-		this.annotedWord = null;
-		this.correspondingURLs = null;
-	}
-	
 	/**
-	 * Constructor just keep the given content
+	 * Constructor just keep the given content multiple annotated Words
 	 * @param annotedSentence
-	 * @param annotedWord
+	 * @param annotedWords
 	 * @param correspondingURLs
 	 */
-	public AnnotObject(String annotedSentence, String annotedWord, List<String> correspondingURLs)
+	public AnnotObject(String annotedSentence, List<String> annotedWords, List<String> correspondingURLs)
 	{
 		this.annotedSentence = annotedSentence;
-		this.annotedWord = annotedWord;
+		this.annotedWords = annotedWords;
 		this.correspondingURLs = correspondingURLs;
 	}
 	
 	public String getAnnotedSentence() {
 		return annotedSentence;
 	}
-
 	public void setAnnotedSentence(String annotedSentence) {
 		this.annotedSentence = annotedSentence;
-	}
-
-	public String getAnnotedWord() {
-		return annotedWord;
-	}
-	public void setAnnotedWord(String annotedWord) {
-		this.annotedWord = annotedWord;
 	}
 	public List<String> getCorrespondingURLs() {
 		return correspondingURLs;
@@ -55,10 +39,10 @@ public class AnnotObject
 	public void setCorrespondingURLs(List<String> correspondingURLs) {
 		this.correspondingURLs = correspondingURLs;
 	}
-	
-	public String toString()
-	{
-		return "Annotation [["+this.annotedWord+"]] correspond to these Url(s) -> "+this.correspondingURLs;
+	public List<String> getAnnotedWords() {
+		return annotedWords;
 	}
-	
+	public void setAnnotedWords(List<String> annotedWords) {
+		this.annotedWords = annotedWords;
+	}	
 }

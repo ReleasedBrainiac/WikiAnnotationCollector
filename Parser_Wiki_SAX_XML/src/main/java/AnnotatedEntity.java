@@ -165,37 +165,45 @@ public class AnnotatedEntity
 	public void getAnnotationsAndUrls(String sentence, List<AnnotObject> annotedObjects)
 	{
 		String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
-		List<String> correspondingURLs2 = new ArrayList<String>();		
+		List<String> correspondingURLs2 = new ArrayList<String>();
+		List<String> annotations = new ArrayList<String>();	
 		
-		Pattern pat = Pattern.compile(regexStr);	
-		Matcher m = pat.matcher(sentence);
-		
-		//Die Suche nach den Annotations und die Generation der Urls
-		while(m.find())
+		if(sentence != null)
 		{
-			 String annotation = m.group(1);
-			 String[] tmp;
-			 correspondingURLs2 = new ArrayList<String>();
-			 
-			 if(annotation.contains("|"))
-			 {
-				 tmp = annotation.split("\\|");
+			Pattern pat = Pattern.compile(regexStr);	
+			Matcher m = pat.matcher(sentence);
+			
+			//Die Suche nach den Annotations und die Generation der Urls
+			while(m.find())
+			{
+				String annotation = m.group(1);
+				annotations.add(annotation);
+				
+				String[] tmp;
+				correspondingURLs2 = new ArrayList<String>();
 				 
-				 for(String annot : tmp){
-					 if(!annot.contains(" "))
-					 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot);}
-					 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot.replace(" ", "_"));}  
-				 }
+				 
+				 
+				 if(annotation.contains("|"))
+				 {
+					 tmp = annotation.split("\\|");
+					 
+					 for(String annot : tmp){
+						 if(!annot.contains(" "))
+						 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot);}
+						 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot.replace(" ", "_"));}  
+					 }
 
-			 }else{
-				 
-				 if(!annotation.contains(" "))
-				 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation);}
-				 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation.replace(" ", "_"));} 
-			 } 
-			 
-			 annotedObjects.add(new AnnotObject(sentence, annotation, correspondingURLs2)); 
+				 }else{
+					 
+					 if(!annotation.contains(" "))
+					 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation);}
+					 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annotation.replace(" ", "_"));} 
+				 } 
+			}
+			annotedObjects.add(new AnnotObject(sentence, annotations, correspondingURLs2)); 
 		}
+		
 	}
 	
 	//############################################################################################

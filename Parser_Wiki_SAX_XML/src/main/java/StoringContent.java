@@ -88,12 +88,18 @@ public class StoringContent
 			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
 			        	objectElem.appendChild(sentenceElem);
 			        	
-			        	wordElem = dom.createElement("Annotation");
-			        	wordElem.appendChild(dom.createTextNode(ao.getAnnotedWord()));
-			        	objectElem.appendChild(wordElem);
+			        	
+			        	
+			        	List<String> annots = ao.getAnnotedWords();
+				        for(int k = 0; k < annots.size(); k++)
+				        {				        	
+				        	wordElem = dom.createElement("Annotation");
+				        	wordElem.appendChild(dom.createTextNode(annots.get(k)));
+				        	objectElem.appendChild(wordElem);
+				        } 
 			       
 				        List<String> urls = ao.getCorrespondingURLs();
-				        for(int k = 0; k < ao.getCorrespondingURLs().size(); k++)
+				        for(int k = 0; k < urls.size(); k++)
 				        {
 				        	//Subnode for annotaions corresponding urls
 			        		subElem = dom.createElement("Url");

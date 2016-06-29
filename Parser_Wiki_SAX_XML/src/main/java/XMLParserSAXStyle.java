@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.IntStream;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -136,6 +138,58 @@ public class XMLParserSAXStyle extends DefaultHandler
 	//############################################################################################
 	//############################################################################################
 	
+	
+	public void startProcess(String[] infiles, String[] outFiles, boolean isParallel, int reportUpdate, String rootElem)
+	{
+		IntStream.range(0, infiles.length).parallel().forEach(file_ID -> 
+		{
+			synchronized(this)
+			{
+				try 
+				{
+					System.out.println("START Thread for File => "+infiles[file_ID]);
+					
+					//For UTF-8 Setup
+					File file = new File(infiles[file_ID]);
+					InputStream inputStream;
+					inputStream = new FileInputStream(file);
+					Reader reader = new InputStreamReader(inputStream,"UTF-8");
+					InputSource is = new InputSource(reader);
+					is.setEncoding("UTF-8");
+					
+					//Init Parser
+					SAXParserFactory parserFactor = SAXParserFactory.newInstance();
+					SAXParser parser = parserFactor.newSAXParser();
+					XMLParserSAXStyle handler = new XMLParserSAXStyle();
+					handler.setProcessState(isParallel);
+					handler.reportUpdate = reportUpdate;
+					parser.parse(is, handler);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+								
+				String rootElement = rootElem;
+				String fileName = outFiles[file_ID];
+				new FileGenerator(fileName);
+				
+				if(isParallel)
+				{
+					new StoringContentSemiParallel(fileName, rootElement, anotEnts);
+				}else{
+					new StoringContent(fileName, rootElement, anotEnts);
+				}
+				
+				System.out.println("Done File: "+infiles[file_ID]+" at "+Calendar.getInstance().getTime());
+			}
+		});
+	}
+	
+	//############################################################################################
+	//############################################################################################
+	//############################################################################################
+	
 	/**
 	 * Central Main-method for the tool.
 	 * @param args
@@ -147,43 +201,73 @@ public class XMLParserSAXStyle extends DefaultHandler
 	{
 		System.out.println("START: "+Calendar.getInstance().getTime());
 		
-		//String path = args[0];
-		String path = "C:/Users/Tobia/Desktop/Texteressourcen für Arbeit/enwiki-latest-pages-articles1.xml";
-		boolean isParallel = true;
+		XMLParserSAXStyle parser = new XMLParserSAXStyle();
 		
-		//For UTF-8 Setup
-		File file = new File(path);
-		InputStream inputStream= new FileInputStream(file);
-		Reader reader = new InputStreamReader(inputStream,"UTF-8");
-		InputSource is = new InputSource(reader);
-		is.setEncoding("UTF-8");
+		String[] infiles = new String[4];
+		infiles[0] = "C:/Users/Subadmin/Desktop/zipped raw Datasets/enwiki-latest-pages-articles1.xml";
+		infiles[1] = "C:/Users/Subadmin/Desktop/zipped raw Datasets/enwiki-latest-pages-articles10.xml";
+		infiles[2] = "C:/Users/Subadmin/Desktop/zipped raw Datasets/enwiki-latest-pages-articles11.xml";
+		infiles[3] = "C:/Users/Subadmin/Desktop/zipped raw Datasets/enwiki-latest-pages-articles12.xml";
 		
-		//Init Parser
-		SAXParserFactory parserFactor = SAXParserFactory.newInstance();
-		SAXParser parser = parserFactor.newSAXParser();
-		XMLParserSAXStyle handler = new XMLParserSAXStyle();
-		handler.setProcessState(isParallel);
-		handler.reportUpdate = 1000;
-		parser.parse(is, handler);
+		String[] outFilesPara = new String[4];
+		outFilesPara[0] = "en-wiki-annotations-and-depencies-parallel_1.xml";
+		outFilesPara[1] = "en-wiki-annotations-and-depencies-parallel_10.xml";
+		outFilesPara[2] = "en-wiki-annotations-and-depencies-parallel_11.xml";
+		outFilesPara[3] = "en-wiki-annotations-and-depencies-parallel_12.xml";
 		
-		//Dateien- und Dom-Bezeichner festlegen
+		String[] outFilesLin = new String[4];
+		outFilesLin[0] = "en-wiki-annotations-and-depencies-lin_1.xml";
+		outFilesLin[1] = "en-wiki-annotations-and-depencies-lin_10.xml";
+		outFilesLin[2] = "en-wiki-annotations-and-depencies-lin_11.xml";
+		outFilesLin[3] = "en-wiki-annotations-and-depencies-lin_12.xml";
 		
-		String fileName = null;
 		String rootElement = "wikiAnnotations";										// = args[2] //is also a possible option to implement.
+		boolean isParallel = true;
 		
 		if(isParallel)
 		{
-			fileName = "en-wiki-annotations-and-depencies-parallel.xml";		// = args[1] //is also a possible option to implement.
-			new FileGenerator(fileName);
-			new StoringContentSemiParallel(fileName, rootElement, anotEnts);
+			parser.startProcess(infiles, outFilesPara, isParallel, 1000, rootElement);
 		}else{
-			fileName = "en-wiki-annotations-and-depencies.xml";				// = args[1] //is also a possible option to implement.
-			new FileGenerator(fileName);
-			new StoringContent(fileName, rootElement, anotEnts);
+			parser.startProcess(infiles, outFilesLin, isParallel, 1000, rootElement);
 		}
-
 		
-		System.out.println("END: "+Calendar.getInstance().getTime());
-		System.out.println("Proceeded Elements: "+run);	
+		
+		
+		
+//		for (int i = 0; i < infiles.length; i++) 
+//		{
+//			//For UTF-8 Setup
+//			File file = new File(infiles[i]);
+//			InputStream inputStream= new FileInputStream(file);
+//			Reader reader = new InputStreamReader(inputStream,"UTF-8");
+//			InputSource is = new InputSource(reader);
+//			is.setEncoding("UTF-8");
+//			
+//			//Init Parser
+//			SAXParserFactory parserFactor = SAXParserFactory.newInstance();
+//			SAXParser parser = parserFactor.newSAXParser();
+//			XMLParserSAXStyle handler = new XMLParserSAXStyle();
+//			handler.setProcessState(isParallel);
+//			handler.reportUpdate = 1000;
+//			parser.parse(is, handler);
+//			
+//			//Dateien- und Dom-Bezeichner festlegen
+//			
+//			String fileName = null;
+//			
+//			if(isParallel)
+//			{
+//				fileName = outFilesPara[i];
+//				new FileGenerator(fileName);
+//				new StoringContentSemiParallel(fileName, rootElement, anotEnts);
+//			}else{
+//				fileName = outFilesLin[i];
+//				new FileGenerator(fileName);
+//				new StoringContent(fileName, rootElement, anotEnts);
+//			}
+//		}
+		
+
+		System.out.println("END ALL at "+Calendar.getInstance().getTime());
 	}
 }

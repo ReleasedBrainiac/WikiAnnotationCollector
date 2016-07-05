@@ -80,7 +80,8 @@ public class AnnotedEntitySemiParallel
 		String regexHeader = Pattern.quote("==") + "(.*?)" + Pattern.quote("==");
 		String regexRK = Pattern.quote("(") + "(.*?)" + Pattern.quote(")");
 		String regexGK = Pattern.quote("{{") + "(.*?)" + Pattern.quote("}}");										
-		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");									
+		String regexRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/ref>");
+		String regexSup = Pattern.quote("<sup") + "(.*?)" + Pattern.quote("/sup>");
 		String regSpecRef = Pattern.quote("<ref") + "(.*?)" + Pattern.quote("/>");									
 		String finalRex = "^[\\w]+[A-Za-z,;()\\w´`\'\"\\s]*[\\[]+[A-Za-z,;()\\w\\|\"\\s]*[\\]]+(.*?)[.?!]$";		
 

@@ -36,7 +36,7 @@ public class ExecuteParsingDatacollection
 	 * @param rootElem
 	 * @param thread_ID
 	 */
-	public void oneCollectorExecute(String inPath, String outPath, XMLParserSAXStyle handler, int reportUpdate, String rootElem, int thread_ID)
+	public void oneCollectorExecute(String inPath, String outPath, XMLParserSAXStyle handler, int reportUpdate, String rootElem, int thread_ID, String destination)
 	{
 		try 
 		{
@@ -59,7 +59,7 @@ public class ExecuteParsingDatacollection
 			
 			// Storing
 			new FileGenerator(outPath);
-			new StoringContentSemiParallel(outPath, rootElem, handler.getAnotEnts());
+			new StoringContentSemiParallel(outPath, rootElem, handler.getAnotEnts(), destination);
 			System.out.println("Done File: "+inPath+" at "+Calendar.getInstance().getTime());
 			
 		} catch (Exception e) {
@@ -77,9 +77,9 @@ public class ExecuteParsingDatacollection
 	public static void main(String[] args) 
 	{
 		System.out.println("START: "+Calendar.getInstance().getTime());
-		
-		String outFile = "full-enwiki-text-file.txt";												//TODO for end content
+
 		String dataSource = "C:/Users/Subadmin/Desktop/Raw Dataset/";
+		String destination = "C:/Users/Subadmin/Desktop/Cleaned/";
 		SupportingFileContent sfc = new SupportingFileContent();
 		ArrayList<String> filepaths = sfc.getFolderFileName(dataSource);
 		String[] infiles = new String[filepaths.size()];
@@ -105,7 +105,7 @@ public class ExecuteParsingDatacollection
 				String rootElem = "wikiAnnotations_from_"+epds[file_ID].wikiArticleName(inPath);
 				String outPath = outFilesPara[file_ID];
 
-				epds[file_ID].oneCollectorExecute(inPath, outPath, new XMLParserSAXStyle(), reportUpdate, rootElem, file_ID);
+				epds[file_ID].oneCollectorExecute(inPath, outPath, new XMLParserSAXStyle(), reportUpdate, rootElem, file_ID, destination);
 			}
 		});
 		

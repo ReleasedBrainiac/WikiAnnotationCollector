@@ -46,7 +46,7 @@ public class SupportingFileContent
 	 * @param outFile
 	 * @param string
 	 */
-	public void writeCommon(String outFile, String data, int breakPoint)
+	public void writeCommon(String outFile, String data)
 	{
 		try(FileWriter fw = new FileWriter(outFile, true);BufferedWriter bw = new BufferedWriter(fw);PrintWriter out = new PrintWriter(bw))
 		{
@@ -60,11 +60,25 @@ public class SupportingFileContent
 	 * @param data
 	 * @param breakPoint
 	 */
-	public void writeCommonUTF8(String outFile, String data, int breakPoint)
+	public void writeCommonUTF8(String outFile, String data)
 	{
 		try(FileOutputStream fos = new FileOutputStream(outFile, true); Writer out = new OutputStreamWriter(fos, "UTF8");)
 		{
 			out.write(data);
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	
+	
+	public void writeListCommonUTF8(String outFile, ArrayList<String> data)
+	{
+		try(FileOutputStream fos = new FileOutputStream(outFile, true); Writer out = new OutputStreamWriter(fos, "UTF8");)
+		{
+			for (int i = 0; i < data.size(); i++) 
+			{
+				out.write(data.get(i));
+				out.write(" \n");
+			}
+			
 		} catch (IOException e) {e.printStackTrace();}
 	}
 }

@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 public class ExecuteParsingFullDataset 
 {
 	
-	public void executeDatsetConstruction(String inFile, String outFile, ParserXMLToText handler, int reportUpdate, int breakpoint)
+	public void executeDatsetConstruction(String inFile, String outFile, ParserXMLToText handler, int reportUpdate)
 	{
 		try 
 		{
@@ -38,12 +38,12 @@ public class ExecuteParsingFullDataset
 			SAXParserFactory parserFactor = SAXParserFactory.newInstance();
 			SAXParser parser = parserFactor.newSAXParser();
 			handler.setReportUpdate(reportUpdate);
-			handler.setBreakpoint(breakpoint);
 			parser.parse(is, handler);
 			
 			// Storing
 			SupportingFileContent sfc = new SupportingFileContent();
-			sfc.writeCommonUTF8(outFile, handler.getFulltext(), breakpoint);
+//			sfc.writeCommonUTF8(outFile, handler.getFulltext());
+			sfc.writeListCommonUTF8(outFile, handler.getLines());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,7 +72,7 @@ public class ExecuteParsingFullDataset
 		
 		for(int a_it = 0; a_it < inFiles.size(); a_it++)
 		{
-			epfd.executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, pxtt, reportUpdate, breakpoint);
+			epfd.executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, pxtt, reportUpdate);
 		}
 
 		System.out.println("END: "+Calendar.getInstance().getTime());

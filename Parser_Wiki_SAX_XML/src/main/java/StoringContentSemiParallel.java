@@ -32,11 +32,11 @@ public class StoringContentSemiParallel
 	 * @param rootElement
 	 * @param aeList
 	 */
-	public StoringContentSemiParallel(String pathXML, String rootElement, List<AnnotedEntitySemiParallel> aeList)
+	public StoringContentSemiParallel(String pathXML, String rootElement, List<AnnotedEntitySemiParallel> aeList, String destination)
 	{
 		System.out.println("Storing Content!");		
-		saveAllToXML(pathXML, rootElement, aeList);
-		saveSentencesToXML("sentences-"+pathXML, rootElement, aeList);
+		saveAllToXML(destination+pathXML, rootElement, aeList);
+		saveSentencesToXML(destination+"sentences-"+pathXML, rootElement, aeList);
 	}
 	
 	//############################################################################################
@@ -137,64 +137,120 @@ public class StoringContentSemiParallel
 	        // create the root element
 	        Element rootElem = dom.createElement(rootElement);
 	        
-	        IntStream.range(0, aeList.size()).parallel().forEach(id -> 
-			{
-				synchronized (this) 
-				{
-					AnnotedEntitySemiParallel curAnnotEnt = aeList.get(id);
-					
-					try 
-	                {
-	    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
-	    	        	{        	
-	    			        
-	    			        //Node for annotaions
-	    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
-	    			        Element objectElem = null;
-    			        	Element sentenceElem  = null;
-    			        	Element wordElem = null;
-    			        	Element urlElem = null;
-	    			        
-	    			        for(int j = 0; j < aoList.size(); j++)
-	    			        {
-	    			        	AnnotObject ao = aoList.get(j);
-	    			        	List<String> annots = ao.getAnnotedWords();
-	    			        	List<String> urls = ao.getCorrespondingURLs();
-	    			        	
-	    			        	// Set Notification Object
-	    			        	objectElem = dom.createElement("AnnotationNotification");
-	    				        rootElem.appendChild(objectElem);
-	    				        
-	    				        // Set Sentence Object
-	    				        sentenceElem  = dom.createElement("Sentence");
-	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
-	    			        	objectElem.appendChild(sentenceElem);
-	    			        	
-	    			        	// Set Annotation Objects
-	    				        for(int k = 0; k < annots.size(); k++)
-	    				        {				        	
-	    				        	wordElem = dom.createElement("Annotation");
-	    				        	wordElem.appendChild(dom.createTextNode(annots.get(k)));
-	    				        	sentenceElem.appendChild(wordElem);
-	    				        } 
-	    				        
-	    				        // Set Url Objects
-	    				        for(int k = 0; k < urls.size(); k++)
-	    				        {
-	    			        		urlElem = dom.createElement("Url");
-	    			        		urlElem.appendChild(dom.createTextNode(urls.get(k)));
-	    			        		sentenceElem.appendChild(urlElem);
-	    				        } 
-	    			        }
-	    	        	}
-	                	
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                }
-				}
+	        
+	        for(int iter = 0; iter < aeList.size(); iter++)
+	        {
+	        	AnnotedEntitySemiParallel curAnnotEnt = aeList.get(iter);
 				
-                
-            });
+				try 
+                {
+    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
+    	        	{        	
+    			        
+    			        //Node for annotaions
+    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
+    			        Element objectElem = null;
+			        	Element sentenceElem  = null;
+			        	Element wordElem = null;
+			        	Element urlElem = null;
+    			        
+    			        for(int j = 0; j < aoList.size(); j++)
+    			        {
+    			        	AnnotObject ao = aoList.get(j);
+    			        	List<String> annots = ao.getAnnotedWords();
+    			        	List<String> urls = ao.getCorrespondingURLs();
+    			        	
+    			        	// Set Notification Object
+    			        	objectElem = dom.createElement("AnnotationNotification");
+    				        rootElem.appendChild(objectElem);
+    				        
+    				        // Set Sentence Object
+    				        sentenceElem  = dom.createElement("Sentence");
+    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+    			        	objectElem.appendChild(sentenceElem);
+    			        	
+    			        	// Set Annotation Objects
+    				        for(int k = 0; k < annots.size(); k++)
+    				        {				        	
+    				        	wordElem = dom.createElement("Annotation");
+    				        	wordElem.appendChild(dom.createTextNode(annots.get(k)));
+    				        	sentenceElem.appendChild(wordElem);
+    				        } 
+    				        
+    				        // Set Url Objects
+    				        for(int k = 0; k < urls.size(); k++)
+    				        {
+    			        		urlElem = dom.createElement("Url");
+    			        		urlElem.appendChild(dom.createTextNode(urls.get(k)));
+    			        		sentenceElem.appendChild(urlElem);
+    				        } 
+    			        }
+    	        	}
+                	
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+	        }
+	        
+	        //Deprecated because produce missing content or false content depencies
+//	        IntStream.range(0, aeList.size()).parallel().forEach(id -> 
+//			{
+//				synchronized (this) 
+//				{
+//					AnnotedEntitySemiParallel curAnnotEnt = aeList.get(id);
+//					
+//					try 
+//	                {
+//	    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
+//	    	        	{        	
+//	    			        
+//	    			        //Node for annotaions
+//	    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
+//	    			        Element objectElem = null;
+//    			        	Element sentenceElem  = null;
+//    			        	Element wordElem = null;
+//    			        	Element urlElem = null;
+//	    			        
+//	    			        for(int j = 0; j < aoList.size(); j++)
+//	    			        {
+//	    			        	AnnotObject ao = aoList.get(j);
+//	    			        	List<String> annots = ao.getAnnotedWords();
+//	    			        	List<String> urls = ao.getCorrespondingURLs();
+//	    			        	
+//	    			        	// Set Notification Object
+//	    			        	objectElem = dom.createElement("AnnotationNotification");
+//	    				        rootElem.appendChild(objectElem);
+//	    				        
+//	    				        // Set Sentence Object
+//	    				        sentenceElem  = dom.createElement("Sentence");
+//	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+//	    			        	objectElem.appendChild(sentenceElem);
+//	    			        	
+//	    			        	// Set Annotation Objects
+//	    				        for(int k = 0; k < annots.size(); k++)
+//	    				        {				        	
+//	    				        	wordElem = dom.createElement("Annotation");
+//	    				        	wordElem.appendChild(dom.createTextNode(annots.get(k)));
+//	    				        	sentenceElem.appendChild(wordElem);
+//	    				        } 
+//	    				        
+//	    				        // Set Url Objects
+//	    				        for(int k = 0; k < urls.size(); k++)
+//	    				        {
+//	    			        		urlElem = dom.createElement("Url");
+//	    			        		urlElem.appendChild(dom.createTextNode(urls.get(k)));
+//	    			        		sentenceElem.appendChild(urlElem);
+//	    				        } 
+//	    			        }
+//	    	        	}
+//	                	
+//	                } catch (Exception e) {
+//	                    e.printStackTrace();
+//	                }
+//				}
+//				
+//                
+//            });
 
 	        dom.appendChild(rootElem);
 

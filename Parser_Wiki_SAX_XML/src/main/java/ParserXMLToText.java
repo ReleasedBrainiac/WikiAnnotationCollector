@@ -12,7 +12,6 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Common SAX-XML-Parser take a enwiki sentence xml and create a textfile.
  * @author T.Turke
- *
  */
 public class ParserXMLToText extends DefaultHandler 
 {
@@ -23,7 +22,6 @@ public class ParserXMLToText extends DefaultHandler
 	private int reportUpdate = 500;
 	private int run = 0;
 
-	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	public StringBuilder everything = new StringBuilder();
 	public ArrayList<String> lines = new ArrayList<String>();

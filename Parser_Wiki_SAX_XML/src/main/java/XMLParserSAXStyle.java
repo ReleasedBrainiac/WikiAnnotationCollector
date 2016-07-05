@@ -10,7 +10,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Common SAX-XML-Parser take a "enwiki.~ ~.xml" file and gather all consisting annotations which aren't file or image annotations.
- * [multiple core optimized]
  * @author T.Turke
  *
  */
@@ -24,8 +23,6 @@ public class XMLParserSAXStyle extends DefaultHandler
 	private int run = 0;
 	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-	
-	
 	
 	/**
 	 * Override: Now check existence of the tag your searching for.

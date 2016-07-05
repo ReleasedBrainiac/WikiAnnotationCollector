@@ -14,7 +14,6 @@ import java.util.Arrays;
 /**
  * This class handle the whole dataset textfile creation functions we need.
  * @author T.Turke
- *
  */
 public class SupportingFileContent 
 {	
@@ -28,7 +27,6 @@ public class SupportingFileContent
 		File f = new File(initialPath);
 		return new ArrayList<String>(Arrays.asList(f.list()));
 	}
-	
 	
 	/**
 	 * Get all folder files
@@ -68,7 +66,11 @@ public class SupportingFileContent
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	
+	/**
+	 * Easy file writer with UTF-8 encoding
+	 * @param outFile
+	 * @param data
+	 */
 	public void writeListCommonUTF8(String outFile, ArrayList<String> data)
 	{
 		try(FileOutputStream fos = new FileOutputStream(outFile, true); Writer out = new OutputStreamWriter(fos, "UTF8");)

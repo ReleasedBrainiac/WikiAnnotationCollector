@@ -6,15 +6,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.stream.IntStream;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.InputSource;
 
+/**
+ * This class collect all desired types of sentences from given enwiki-article.xml and store it into another structured xml.
+ * @author T.Turke
+ */
 public class ExecuteParsingDatacollection 
 {
 	/**
@@ -28,7 +29,7 @@ public class ExecuteParsingDatacollection
 	}
 	
 	/**
-	 * This method define 1 collector for 1 file.
+	 * This method define 1 collector for 1 file. It can be used in a thread structure.
 	 * @param inPath
 	 * @param outPath
 	 * @param handler
@@ -70,46 +71,46 @@ public class ExecuteParsingDatacollection
 	
 	
 	
-	/**
-	 * START ENGINE
-	 * @param args
-	 */
-	public static void main(String[] args) 
-	{
-		System.out.println("START: "+Calendar.getInstance().getTime());
-
-		String dataSource = "C:/Users/Subadmin/Desktop/Raw Dataset/";
-		String destination = "C:/Users/Subadmin/Desktop/Cleaned/";
-		SupportingFileContent sfc = new SupportingFileContent();
-		ArrayList<String> filepaths = sfc.getFolderFileName(dataSource);
-		String[] infiles = new String[filepaths.size()];
-		String[] outFilesPara = new String[filepaths.size()];
-		ExecuteParsingDatacollection initEDP = new ExecuteParsingDatacollection();					//For initial
-		ExecuteParsingDatacollection [] epds = new ExecuteParsingDatacollection[filepaths.size()];
-		
-		
-		for (int i = 0; i < filepaths.size(); i++) 
-		{
-			infiles[i] = dataSource+filepaths.get(i);			
-			outFilesPara[i] = "en-wiki-annotations-and-depencies-parallel_"+initEDP.wikiArticleName(infiles[i])+".xml";
-			epds[i] = new ExecuteParsingDatacollection();
-		}
-		
-		IntStream.range(0, filepaths.size()).parallel().forEach(file_ID -> 
-		{
-			int reportUpdate = 10000;
-			
-			synchronized(epds[file_ID])
-			{
-				String inPath = infiles[file_ID];
-				String rootElem = "wikiAnnotations_from_"+epds[file_ID].wikiArticleName(inPath);
-				String outPath = outFilesPara[file_ID];
-
-				epds[file_ID].oneCollectorExecute(inPath, outPath, new XMLParserSAXStyle(), reportUpdate, rootElem, file_ID, destination);
-			}
-		});
-		
-		System.out.println("END ALL at "+Calendar.getInstance().getTime());
-	}
+//	/**
+//	 * START ENGINE Collector
+//	 * @param args
+//	 */
+//	public static void main(String[] args) 
+//	{
+//		System.out.println("START: "+Calendar.getInstance().getTime());
+//
+//		String dataSource = "C:/Users/Subadmin/Desktop/Raw Dataset/";
+//		String destination = "C:/Users/Subadmin/Desktop/Cleaned/";
+//		SupportingFileContent sfc = new SupportingFileContent();
+//		ArrayList<String> filepaths = sfc.getFolderFileName(dataSource);
+//		String[] infiles = new String[filepaths.size()];
+//		String[] outFilesPara = new String[filepaths.size()];
+//		ExecuteParsingDatacollection initEDP = new ExecuteParsingDatacollection();					//For initial
+//		ExecuteParsingDatacollection [] epds = new ExecuteParsingDatacollection[filepaths.size()];
+//		
+//		
+//		for (int i = 0; i < filepaths.size(); i++) 
+//		{
+//			infiles[i] = dataSource+filepaths.get(i);			
+//			outFilesPara[i] = "en-wiki-annotations-and-depencies-parallel_"+initEDP.wikiArticleName(infiles[i])+".xml";
+//			epds[i] = new ExecuteParsingDatacollection();
+//		}
+//		
+//		IntStream.range(0, filepaths.size()).parallel().forEach(file_ID -> 
+//		{
+//			int reportUpdate = 10000;
+//			
+//			synchronized(epds[file_ID])
+//			{
+//				String inPath = infiles[file_ID];
+//				String rootElem = "wikiAnnotations_from_"+epds[file_ID].wikiArticleName(inPath);
+//				String outPath = outFilesPara[file_ID];
+//
+//				epds[file_ID].oneCollectorExecute(inPath, outPath, new XMLParserSAXStyle(), reportUpdate, rootElem, file_ID, destination);
+//			}
+//		});
+//		
+//		System.out.println("END ALL at "+Calendar.getInstance().getTime());
+//	}
 
 }

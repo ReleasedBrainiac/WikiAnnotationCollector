@@ -3,7 +3,7 @@ package main.java;
 import java.util.regex.Pattern;
 
 /**
- * This class is the REX class for overline depencies which needed to be REXED.
+ * This class is the REX class for multiline depencies which needed to be REXED.
  * @author T.Turke
  *
  */
@@ -14,7 +14,7 @@ public class Appendings
 	private String rex = null;
 	
 	/**
-	 * Construtor gather regEx start and end tags
+	 * Constructor gather regEx start and end tags
 	 * @param rexStart
 	 * @param rexEnd
 	 */

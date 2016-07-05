@@ -20,6 +20,13 @@ import org.xml.sax.InputSource;
 public class ExecuteParsingFullDataset 
 {
 	
+	/**
+	 * This methode generate a fulltext from given xml content.
+	 * @param inFile
+	 * @param outFile
+	 * @param handler
+	 * @param reportUpdate
+	 */
 	public void executeDatsetConstruction(String inFile, String outFile, ParserXMLToText handler, int reportUpdate)
 	{
 		try 
@@ -51,31 +58,29 @@ public class ExecuteParsingFullDataset
 		}	
 	}
 
-	/**
-	 * Just testing
-	 * @param args
-	 */
-	public static void main(String[] args) 
-	{
-		System.out.println("START: "+Calendar.getInstance().getTime());
-		
-		String dataSource = "C:/Users/Subadmin/Desktop/Cleaned/";
-		String outFile = "C:/Users/Subadmin/Desktop/Cleaned Fulltext/full-enwiki-text-file.txt";
-		int reportUpdate = 10000;
-		int breakpoint = 6;
-		
-		SupportingFileContent sfc = new SupportingFileContent();
-		ArrayList<File> inFiles = sfc.getFolderFiles(dataSource);
-		ExecuteParsingFullDataset epfd = new ExecuteParsingFullDataset();
-		ParserXMLToText pxtt = new ParserXMLToText();
-		
-		
-		for(int a_it = 0; a_it < inFiles.size(); a_it++)
-		{
-			epfd.executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, pxtt, reportUpdate);
-		}
-
-		System.out.println("END: "+Calendar.getInstance().getTime());
-
-	}
+//	/**
+//	 * START ENGINE Dataset creation
+//	 * @param args
+//	 */
+//	public static void main(String[] args) 
+//	{
+//		System.out.println("START: "+Calendar.getInstance().getTime());
+//		
+//		String dataSource = "C:/Users/Subadmin/Desktop/Cleaned/";
+//		String outFile = "C:/Users/Subadmin/Desktop/Cleaned Fulltext/full-enwiki-text-file.txt";
+//		int reportUpdate = 10000;
+//		
+//		SupportingFileContent sfc = new SupportingFileContent();
+//		ArrayList<File> inFiles = sfc.getFolderFiles(dataSource);
+//		ExecuteParsingFullDataset epfd = new ExecuteParsingFullDataset();
+//		ParserXMLToText pxtt = new ParserXMLToText();
+//		
+//		
+//		for(int a_it = 0; a_it < inFiles.size(); a_it++)
+//		{
+//			epfd.executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, pxtt, reportUpdate);
+//		}
+//
+//		System.out.println("END: "+Calendar.getInstance().getTime());
+//	}
 }

@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -15,15 +18,16 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ParserXMLToText extends DefaultHandler 
 {
+	
+	private String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
 	private boolean isTextTag =false;
 	private static String text = null;
-	public StringBuilder everything = new StringBuilder();
 	private int reportUpdate = 500;
 	private int run = 0;
 	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-	
-	
+	public StringBuilder everything = new StringBuilder();
+	public int max_sized_annotation = -1;
 	
 	/**
 	 * Override: Now check existence of the tag your searching for.
@@ -53,6 +57,15 @@ public class ParserXMLToText extends DefaultHandler
 		{
 			case "Sentence":
 			{
+				Pattern pattern = Pattern.compile(regexStr);
+				Matcher matcher = pattern.matcher(text);
+				
+				if (matcher.find())
+				{
+				    System.out.println(matcher.group(1));
+				    max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);
+				}
+				
 				everything.append(text);
 
 				if(run % reportUpdate == 0)

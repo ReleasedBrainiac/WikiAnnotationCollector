@@ -95,7 +95,7 @@ public class ExecuteParsingDatacollection
 			epds[i] = new ExecuteParsingDatacollection();
 		}
 		
-		IntStream.range(0, infiles.length).parallel().forEach(file_ID -> 
+		IntStream.range(0, filepaths.size()).parallel().forEach(file_ID -> 
 		{
 			int reportUpdate = 10000;
 			

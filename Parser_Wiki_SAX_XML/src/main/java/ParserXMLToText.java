@@ -67,7 +67,7 @@ public class ParserXMLToText extends DefaultHandler
 					text+= "\n";
 				}
 				
-				everything.append(text);
+				everything.append(text+" ");
 				if(run % reportUpdate == 0){runAndTime(run);}
 			}	
 		}

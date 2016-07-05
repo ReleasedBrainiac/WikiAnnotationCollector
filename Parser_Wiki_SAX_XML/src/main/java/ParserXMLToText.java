@@ -9,18 +9,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Common SAX-XML-Parser take a "enwiki.~ ~.xml" file and gather all consisting annotations which aren't file or image annotations.
- * [multiple core optimized]
+ * Common SAX-XML-Parser take a enwiki sentence xml and create a textfile.
  * @author T.Turke
  *
  */
-public class XMLParserSAXStyle extends DefaultHandler 
+public class ParserXMLToText extends DefaultHandler 
 {
-	private List<AnnotedEntitySemiParallel> anotEnts = new ArrayList<AnnotedEntitySemiParallel>();
 	private boolean isTextTag =false;
 	private static String text = null;
+	public StringBuilder everything = new StringBuilder();
 	private int reportUpdate = 500;
-	private int thread_ID = -1;
 	private int run = 0;
 	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -35,7 +33,7 @@ public class XMLParserSAXStyle extends DefaultHandler
 	{
 		text = "";
 		isTextTag = false;
-		if(qName.equalsIgnoreCase("text")){
+		if(qName.equalsIgnoreCase("Sentence")){
 			isTextTag=true; 
 			run++;
 		}
@@ -53,13 +51,13 @@ public class XMLParserSAXStyle extends DefaultHandler
 	{
 		switch (qName) 
 		{
-			case "text":
+			case "Sentence":
 			{
-				anotEnts.add(new AnnotedEntitySemiParallel(text));	//semi parallel
+				everything.append(text);
 
 				if(run % reportUpdate == 0)
 				{
-					runAndTime(run, getThread_ID());
+					runAndTime(run);
 				}
 			}	
 		}
@@ -89,22 +87,14 @@ public class XMLParserSAXStyle extends DefaultHandler
 	 * Report Update
 	 * @param current desired node
 	 */
-	public void runAndTime(int run, int thread_ID)
+	public void runAndTime(int run)
 	{		
-		System.out.println("Thread => "+thread_ID+" | Run => "+run+" | Time: "+dateFormat.format(Calendar.getInstance().getTime()));
+		System.out.println("Run => "+run+" | Time: "+dateFormat.format(Calendar.getInstance().getTime()));
 	}
 	
 	//############################################################################################
 	//############################################################################################
 	//############################################################################################
-
-	public List<AnnotedEntitySemiParallel> getAnotEnts() {
-		return anotEnts;
-	}
-
-	public void setAnotEnts(List<AnnotedEntitySemiParallel> anotEnts) {
-		this.anotEnts = anotEnts;
-	}
 
 	public int getReportUpdate() {
 		return reportUpdate;
@@ -114,13 +104,17 @@ public class XMLParserSAXStyle extends DefaultHandler
 		this.reportUpdate = reportUpdate;
 	}
 
-	public int getThread_ID() {
-		return thread_ID;
+	public StringBuilder getEverything() {
+		return everything;
 	}
 
-	public void setThread_ID(int thread_ID) {
-		this.thread_ID = thread_ID;
+	public void setEverything(StringBuilder everything) {
+		this.everything = everything;
 	}
 	
-	
+	public String getFulltext()
+	{
+		return everything.toString();
+	}
 }
+

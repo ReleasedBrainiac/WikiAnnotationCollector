@@ -217,7 +217,8 @@ public class AnnotedEntitySemiParallel
 				 {
 					 tmp = annotation.split("\\|");
 					 
-					 for(String annot : tmp){
+					 for(String annot : tmp)
+					 {
 						 if(!annot.contains(" "))
 						 {		correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot);}
 						 else{	correspondingURLs2.add("https://en.wikipedia.org/wiki/"+annot.replace(" ", "_"));}  

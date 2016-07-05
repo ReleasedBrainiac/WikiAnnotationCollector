@@ -1,12 +1,9 @@
 package main.java;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -59,19 +56,9 @@ public class ParserXMLToText extends DefaultHandler
 			{
 				Pattern pattern = Pattern.compile(regexStr);
 				Matcher matcher = pattern.matcher(text);
-				
-				if (matcher.find())
-				{
-				    System.out.println(matcher.group(1));
-				    max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);
-				}
-				
+				if (matcher.find()){ max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);}
 				everything.append(text);
-
-				if(run % reportUpdate == 0)
-				{
-					runAndTime(run);
-				}
+				if(run % reportUpdate == 0){runAndTime(run);}
 			}	
 		}
 	}
@@ -86,10 +73,7 @@ public class ParserXMLToText extends DefaultHandler
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException 
 	{
-		if(isTextTag)
-		{	
-			text += new String(ch, start, length);
-		}
+		if(isTextTag){text += new String(ch, start, length);}
 	}
 	
 	//############################################################################################

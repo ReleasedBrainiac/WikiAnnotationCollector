@@ -2,14 +2,22 @@ package main.java;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * This class handle the whole dataset textfile creation functions we need.
+ * @author T.Turke
+ *
+ */
 public class SupportingFileContent 
-{
-
+{	
 	/**
 	 * Get all folder file names
 	 * @param initialPath
@@ -33,57 +41,30 @@ public class SupportingFileContent
 		return new ArrayList<File>(Arrays.asList(f.listFiles()));
 	}
 	
-	
-	public void write(String outFile, String data)
+	/**
+	 * Easy file writer
+	 * @param outFile
+	 * @param string
+	 */
+	public void writeCommon(String outFile, String data, int breakPoint)
 	{
-		try
+		try(FileWriter fw = new FileWriter(outFile, true);BufferedWriter bw = new BufferedWriter(fw);PrintWriter out = new PrintWriter(bw))
 		{
-    		File file =new File(outFile);
-    		if(!file.exists()){file.createNewFile();}
-    		
-    		//true = append file
-    		FileWriter fileWritter = new FileWriter(file.getName(),true);
-    		BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-    		bufferWritter.write(data);
-    		bufferWritter.close();
-	        System.out.println("Done");
-	        
-    	}catch(IOException e){
-    		e.printStackTrace();
-    	}
-		
-		/*
-		 try 
-		  	{
-    			Files.write(Paths.get("myfile.txt"), "the text".getBytes(), StandardOpenOption.APPEND);
-			}catch (IOException e) {
-    			//exception handling left as an exercise for the reader
-			}
-		 */
-		
-		
-		/*
-		 try(FileWriter fw = new FileWriter("outfilename", true);
-    		BufferedWriter bw = new BufferedWriter(fw);
-    		PrintWriter out = new PrintWriter(bw))
-		{
-    		out.println("the text");
-    		//more code
-    		out.println("more text");
-    		//more code
-		} catch (IOException e) {
-    	//exception handling left as an exercise for the reader
-		}
-		 */
+			out.write(data);
+		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	
-	public static void main(String[] args) 
+	/**
+	 * Easy file writer with UTF-8 encoding
+	 * @param outFile
+	 * @param data
+	 * @param breakPoint
+	 */
+	public void writeCommonUTF8(String outFile, String data, int breakPoint)
 	{
-		String outFile = "full-enwiki-text-file.txt";
-		SupportingFileContent sfc = new SupportingFileContent();
-		System.out.println(sfc.getFolderFileName("C:/Users/Subadmin/Desktop/Raw Dataset"));
-
+		try(FileOutputStream fos = new FileOutputStream(outFile, true); Writer out = new OutputStreamWriter(fos, "UTF8");)
+		{
+			out.write(data);
+		} catch (IOException e) {e.printStackTrace();}
 	}
-
 }

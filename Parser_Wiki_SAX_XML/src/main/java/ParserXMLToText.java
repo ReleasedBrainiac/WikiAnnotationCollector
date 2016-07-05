@@ -20,7 +20,10 @@ public class ParserXMLToText extends DefaultHandler
 	private boolean isTextTag =false;
 	private static String text = null;
 	private int reportUpdate = 500;
+	private int call_count = 0;
+	private int breakpoint = -1;
 	private int run = 0;
+
 	
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	public StringBuilder everything = new StringBuilder();
@@ -54,9 +57,16 @@ public class ParserXMLToText extends DefaultHandler
 		{
 			case "Sentence":
 			{
+				call_count++;
 				Pattern pattern = Pattern.compile(regexStr);
 				Matcher matcher = pattern.matcher(text);
 				if (matcher.find()){ max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);}
+				
+				if(call_count % breakpoint == 0)
+				{
+					text+= "\n";
+				}
+				
 				everything.append(text);
 				if(run % reportUpdate == 0){runAndTime(run);}
 			}	
@@ -112,6 +122,14 @@ public class ParserXMLToText extends DefaultHandler
 	public String getFulltext()
 	{
 		return everything.toString();
+	}
+
+	public int getBreakpoint() {
+		return breakpoint;
+	}
+
+	public void setBreakpoint(int breakpoint) {
+		this.breakpoint = breakpoint;
 	}
 }
 

@@ -1,5 +1,4 @@
 # The WikiAnnotationCollector 
-(a.k.a. XMLParserSAXStyle)
 
 #Intorduction:
 

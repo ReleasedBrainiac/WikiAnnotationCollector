@@ -49,7 +49,6 @@ public class ExecuteParsingFullDataset
 			
 			// Storing
 			SupportingFileContent sfc = new SupportingFileContent();
-//			sfc.writeCommonUTF8(outFile, handler.getFulltext());
 			sfc.writeListCommonUTF8(outFile, handler.getLines());
 			
 		} catch (Exception e) {
@@ -58,29 +57,27 @@ public class ExecuteParsingFullDataset
 		}	
 	}
 
-//	/**
-//	 * START ENGINE Dataset creation
-//	 * @param args
-//	 */
-//	public static void main(String[] args) 
-//	{
-//		System.out.println("START: "+Calendar.getInstance().getTime());
-//		
-//		String dataSource = "C:/Users/Subadmin/Desktop/Cleaned/";
-//		String outFile = "C:/Users/Subadmin/Desktop/Cleaned Fulltext/full-enwiki-text-file.txt";
-//		int reportUpdate = 10000;
-//		
-//		SupportingFileContent sfc = new SupportingFileContent();
-//		ArrayList<File> inFiles = sfc.getFolderFiles(dataSource);
-//		ExecuteParsingFullDataset epfd = new ExecuteParsingFullDataset();
-//		ParserXMLToText pxtt = new ParserXMLToText();
-//		
-//		
-//		for(int a_it = 0; a_it < inFiles.size(); a_it++)
-//		{
-//			epfd.executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, pxtt, reportUpdate);
-//		}
-//
-//		System.out.println("END: "+Calendar.getInstance().getTime());
-//	}
+	/**
+	 * START ENGINE Dataset creation
+	 * @param args
+	 */
+	public static void main(String[] args) 
+	{
+		System.out.println("START: "+Calendar.getInstance().getTime());
+		
+		String dataSource = "C:/Users/Subadmin/Desktop/Cleaned/";
+		String outFile = "C:/Users/Subadmin/Desktop/small-data-set.txt";
+		int reportUpdate = 10000;
+		
+		SupportingFileContent sfc = new SupportingFileContent();
+		ArrayList<File> inFiles = sfc.getFolderFiles(dataSource);
+		ExecuteParsingFullDataset epfd = new ExecuteParsingFullDataset();
+		
+		for(int a_it = 0; a_it < inFiles.size(); a_it++)
+		{
+			new ExecuteParsingFullDataset().executeDatsetConstruction(inFiles.get(a_it).getAbsolutePath(), outFile, new ParserXMLToText(), reportUpdate);
+		}
+
+		System.out.println("END: "+Calendar.getInstance().getTime());
+	}
 }

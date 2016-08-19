@@ -23,7 +23,6 @@ public class ParserXMLToText extends DefaultHandler
 	private int run = 0;
 
 	public static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-	public StringBuilder everything = new StringBuilder();
 	public ArrayList<String> lines = new ArrayList<String>();
 	public int max_sized_annotation = -1;
 	
@@ -57,10 +56,20 @@ public class ParserXMLToText extends DefaultHandler
 			{
 				Pattern pattern = Pattern.compile(regexStr);
 				Matcher matcher = pattern.matcher(text);
+				
 				if (matcher.find()){ max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);}
 				if(run % reportUpdate == 0){runAndTime(run);}
-				everything.append(text+"\n");
-				lines.add(text);
+				
+				if(lines.size()>1)
+				{
+					if(!lines.get(lines.size()-1).equals(text))
+					{
+						lines.add(text);
+					}
+				}else{
+					lines.add(text);
+				}
+				
 			}	
 		}
 	}
@@ -101,19 +110,6 @@ public class ParserXMLToText extends DefaultHandler
 
 	public void setReportUpdate(int reportUpdate) {
 		this.reportUpdate = reportUpdate;
-	}
-
-	public StringBuilder getEverything() {
-		return everything;
-	}
-
-	public void setEverything(StringBuilder everything) {
-		this.everything = everything;
-	}
-	
-	public String getFulltext()
-	{
-		return everything.toString();
 	}
 
 	public ArrayList<String> getLines() {

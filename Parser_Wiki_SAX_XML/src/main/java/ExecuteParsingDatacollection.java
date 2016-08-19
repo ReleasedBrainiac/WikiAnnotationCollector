@@ -68,49 +68,4 @@ public class ExecuteParsingDatacollection
 			System.out.println("FAILED File: "+inPath+" at "+Calendar.getInstance().getTime());
 		}	
 	}
-	
-	
-	
-//	/**
-//	 * START ENGINE Collector
-//	 * @param args
-//	 */
-//	public static void main(String[] args) 
-//	{
-//		System.out.println("START: "+Calendar.getInstance().getTime());
-//
-//		String dataSource = "C:/Users/Subadmin/Desktop/Raw Dataset/";
-//		String destination = "C:/Users/Subadmin/Desktop/Cleaned/";
-//		SupportingFileContent sfc = new SupportingFileContent();
-//		ArrayList<String> filepaths = sfc.getFolderFileName(dataSource);
-//		String[] infiles = new String[filepaths.size()];
-//		String[] outFilesPara = new String[filepaths.size()];
-//		ExecuteParsingDatacollection initEDP = new ExecuteParsingDatacollection();					//For initial
-//		ExecuteParsingDatacollection [] epds = new ExecuteParsingDatacollection[filepaths.size()];
-//		
-//		
-//		for (int i = 0; i < filepaths.size(); i++) 
-//		{
-//			infiles[i] = dataSource+filepaths.get(i);			
-//			outFilesPara[i] = "en-wiki-annotations-and-depencies-parallel_"+initEDP.wikiArticleName(infiles[i])+".xml";
-//			epds[i] = new ExecuteParsingDatacollection();
-//		}
-//		
-//		IntStream.range(0, filepaths.size()).parallel().forEach(file_ID -> 
-//		{
-//			int reportUpdate = 10000;
-//			
-//			synchronized(epds[file_ID])
-//			{
-//				String inPath = infiles[file_ID];
-//				String rootElem = "wikiAnnotations_from_"+epds[file_ID].wikiArticleName(inPath);
-//				String outPath = outFilesPara[file_ID];
-//
-//				epds[file_ID].oneCollectorExecute(inPath, outPath, new XMLParserSAXStyle(), reportUpdate, rootElem, file_ID, destination);
-//			}
-//		});
-//		
-//		System.out.println("END ALL at "+Calendar.getInstance().getTime());
-//	}
-
 }

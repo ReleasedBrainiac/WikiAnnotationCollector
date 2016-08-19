@@ -36,7 +36,20 @@ public class SupportingFileContent
 	public ArrayList<File> getFolderFiles(String initialPath)
 	{
 		File f = new File(initialPath);
-		return new ArrayList<File>(Arrays.asList(f.listFiles()));
+		
+		ArrayList<File> output = new ArrayList<File>();
+		File[] raw = f.listFiles();
+		
+		
+		for (int i = 0; i < raw.length; i++) 
+		{
+			if(raw[i].isFile())
+			{
+				output.add(raw[i]);
+			}
+		}
+		
+		return output;
 	}
 	
 	/**
@@ -73,14 +86,32 @@ public class SupportingFileContent
 	 */
 	public void writeListCommonUTF8(String outFile, ArrayList<String> data)
 	{
-		try(FileOutputStream fos = new FileOutputStream(outFile, true); Writer out = new OutputStreamWriter(fos, "UTF8");)
+		try(FileWriter fw = new FileWriter(outFile, true); BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile),"UTF-8")); PrintWriter out = new PrintWriter(bw))
 		{
+			
 			for (int i = 0; i < data.size(); i++) 
 			{
 				out.write(data.get(i));
 				out.write(" \n");
 			}
-			
-		} catch (IOException e) {e.printStackTrace();}
+	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	/**
+	 * Easy file writer with UTF-8 encoding
+	 * @param outFile
+	 * @param data
+	 */
+	public void writeListCommonUTF8_SB(String outFile, StringBuilder data)
+	{
+		try(FileWriter fw = new FileWriter(outFile, true); BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile),"UTF-8")); PrintWriter out = new PrintWriter(bw))
+		{
+			out.write(data.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 }

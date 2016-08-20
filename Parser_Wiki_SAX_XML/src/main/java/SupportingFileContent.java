@@ -94,6 +94,10 @@ public class SupportingFileContent
 				out.write(data.get(i));
 				out.write(" \n");
 			}
+			
+			out.close();
+			bw.close();
+			fw.close();
 	
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -38,6 +38,7 @@ public class ExecuteParsingFullDataset
 			InputStream inputStream;
 			inputStream = new FileInputStream(file);
 			Reader reader = new InputStreamReader(inputStream,"UTF-8");
+//			Reader reader = new InputStreamReader(inputStream);
 			InputSource is = new InputSource(reader);
 			is.setEncoding("UTF-8");
 			

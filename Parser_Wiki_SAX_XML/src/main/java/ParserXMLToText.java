@@ -64,7 +64,13 @@ public class ParserXMLToText extends DefaultHandler
 				{
 					if(!lines.get(lines.size()-1).equals(text))
 					{
-						lines.add(text);
+						if(text.contains(lines.get(lines.size()-1)))
+						{
+							lines.add(text.replace(lines.get(lines.size()-1), ""));
+						}else{
+							lines.add(text);
+						}
+						
 					}
 				}else{
 					lines.add(text);

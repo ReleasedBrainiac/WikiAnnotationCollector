@@ -3,6 +3,8 @@
  * If you got special literals here you can convert them.
  * Just add a port of the construct to the code.
  * 
+ * Attention: This class is currently not in use!
+ * 
  * Inspired by Michael Hoffmann!
  * 
  * @author TTurke

@@ -17,5 +17,9 @@ enwiki.xml
 The Programm has 2 primar parts. The 1st is the Datacollector (ExecuteParsingDatacollection.java) and the 2nd ist the Datsetcreator (ExecuteParsingFullDataset.java). If want to execute both in a one step pipeline there is a class named "Execute.java".
 You need to setup somevariables about paths and the report update in the code, please keep that in mind. The single use is similiar but you need to use the spezific classes from above. (There are som example main() methods.)
 
+#Problems:
+
+The programm isnt perfect currently because of some struggle at the full text generation. Please feel free to update or edit this part if you a familiar with thise content.
+
 Greetings 
 ReleasedBrainiac

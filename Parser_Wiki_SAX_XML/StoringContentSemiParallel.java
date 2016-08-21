@@ -64,31 +64,66 @@ public class StoringContentSemiParallel
 	        // create the root element
 	        Element rootElem = dom.createElement(rootElement);
 	        
-	        IntStream.range(0, aeList.size()).parallel().forEach(id -> 
-			{
-				synchronized (this) 
-				{
-					try 
-	                {
-	    	        	AnnotedEntitySemiParallel curAnnotEnt = aeList.get(id);
-	    	        	
-	    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
-	    	        	{        	
-	    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
-	    			        Element objectElem = dom.createElement("AnnotationNotification");
-    			        	Element sentenceElem  = dom.createElement("Sentence");
-	    			        
-	    			        for(int j = 0; j < aoList.size(); j++)
-	    			        {
-	    			        	AnnotObject ao = aoList.get(j);
-	    				        rootElem.appendChild(objectElem);
-	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
-	    			        	objectElem.appendChild(sentenceElem);
-	    			        }
-	    	        	}
-	                } catch (Exception e) {e.printStackTrace();}
-				} 
-            });
+//	        IntStream.range(0, aeList.size()).parallel().forEach(id -> 
+//			{
+//				synchronized (this) 
+//				{
+//					try 
+//	                {
+//	    	        	AnnotedEntitySemiParallel curAnnotEnt = aeList.get(id);
+//	    	        	
+//	    	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
+//	    	        	{        	
+//	    			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
+//	    			        Element objectElem = dom.createElement("AnnotationNotification");
+//    			        	Element sentenceElem  = dom.createElement("Sentence");
+//	    			        
+//	    			        for(int j = 0; j < aoList.size(); j++)
+//	    			        {
+//	    			        	AnnotObject ao = aoList.get(j);
+//	    				        rootElem.appendChild(objectElem);
+//	    			        	sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+//	    			        	objectElem.appendChild(sentenceElem);
+//	    			        }
+//	    	        	}
+//	                } catch (Exception e) {e.printStackTrace();}
+//				} 
+//            });
+	        
+	        for (int i = 0; i < aeList.size(); i++) 
+	        {
+	        	AnnotedEntitySemiParallel curAnnotEnt = aeList.get(id);
+	        	
+	        	if(curAnnotEnt.getAnnotedObjects().size() > 0)
+	        	{        	
+			        List<AnnotObject> aoList = curAnnotEnt.getAnnotedObjects();
+			        Element objectElem = dom.createElement("AnnotationNotification");
+		        	Element sentenceElem  = dom.createElement("Sentence");
+			        
+			        for(int j = 0; j < aoList.size(); j++)
+			        {
+			        	AnnotObject ao = aoList.get(j);
+				        rootElem.appendChild(objectElem);
+			        	
+			        	if(j > 0)
+			        	{
+			        		if(!aoList.get(j-1).getAnnotedSentence().contains(ao.getAnnotedSentence()))
+			        		{
+			        			sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+					        	objectElem.appendChild(sentenceElem);
+			        		}	
+			        	}else{
+			        		sentenceElem.appendChild(dom.createTextNode(ao.getAnnotedSentence()));
+				        	objectElem.appendChild(sentenceElem);
+			        	}
+			        	
+			        	
+			        	
+			        }
+	        	}
+			}
+	        
+	        
 
 	        dom.appendChild(rootElem);
 

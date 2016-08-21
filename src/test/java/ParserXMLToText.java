@@ -18,8 +18,6 @@ public class ParserXMLToText extends DefaultHandler
 	private String regexStr = Pattern.quote("[[") + "(.*?)" + Pattern.quote("]]");
 	private boolean isTextTag =false;
 	private static String text;
-	private String test_text;
-	private static String reset = null;
 	private int reportUpdate = 500;
 	private int run = 0;
 
@@ -57,12 +55,9 @@ public class ParserXMLToText extends DefaultHandler
 			{
 				Pattern pattern = Pattern.compile(regexStr);
 				Matcher matcher = pattern.matcher(text);
-				String current_elem = getTest_text();
 				
 				if (matcher.find()){ max_sized_annotation = Math.max(max_sized_annotation, matcher.group(1).length()+4);}
 				if(run % reportUpdate == 0){runAndTime(run);}
-				
-				
 				
 				//TODO umdenken
 				
@@ -98,7 +93,6 @@ public class ParserXMLToText extends DefaultHandler
 		if(isTextTag)
 		{
 			text += new String(ch, start, length);
-			setTest_text(new String(ch, start, length));
 		}
 	}
 	
@@ -123,14 +117,6 @@ public class ParserXMLToText extends DefaultHandler
 	
 	public int getReportUpdate() {
 		return reportUpdate;
-	}
-
-	public String getTest_text() {
-		return test_text;
-	}
-
-	public void setTest_text(String test_text) {
-		this.test_text = test_text;
 	}
 
 	public void setReportUpdate(int reportUpdate) {

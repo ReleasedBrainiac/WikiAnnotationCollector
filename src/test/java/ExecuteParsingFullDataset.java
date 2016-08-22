@@ -69,7 +69,6 @@ public class ExecuteParsingFullDataset
 		
 		SupportingFileContent sfc = new SupportingFileContent();
 		ArrayList<File> inFiles = sfc.getFolderFiles(dataSource);
-		ExecuteParsingFullDataset epfd = new ExecuteParsingFullDataset();
 		
 		for(int a_it = 0; a_it < inFiles.size(); a_it++)
 		{

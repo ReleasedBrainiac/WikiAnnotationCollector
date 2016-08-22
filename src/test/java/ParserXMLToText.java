@@ -9,7 +9,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Common SAX-XML-Parser take a enwiki sentence xml and create a textfile.
+ * Common SAX-XML-Parser take a enwiki sentence xml and create a text file.
+ * 
+ * Attention: There seem to be some errors with the variable "text" during clear => lead to some duplicated contents.
  * @author T.Turke
  */
 public class ParserXMLToText extends DefaultHandler 

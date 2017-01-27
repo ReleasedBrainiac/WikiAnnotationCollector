@@ -1,8 +1,12 @@
-package engine;
+package engine.Process;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.stream.IntStream;
+
+import engine.IO.ParserXMLToText;
+import engine.IO.SupportingFileContent;
+import engine.IO.XMLParserSAXStyle;
 
 /**
  * This class start the process pipe from gathering the wanted stuff to storing as usable dataset.

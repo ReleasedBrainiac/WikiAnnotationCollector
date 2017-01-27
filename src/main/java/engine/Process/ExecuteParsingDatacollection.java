@@ -1,4 +1,4 @@
-package engine;
+package engine.Process;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -8,6 +8,10 @@ import java.util.Calendar;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
+
+import engine.IO.FileGenerator;
+import engine.IO.StoringContentSemiParallel;
+import engine.IO.XMLParserSAXStyle;
 
 /**
  * This class collect all desired types of sentences from given enwiki-article.xml and store it into another structured xml.

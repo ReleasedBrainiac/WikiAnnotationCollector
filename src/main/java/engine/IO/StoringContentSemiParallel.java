@@ -1,4 +1,4 @@
-package engine;
+package engine.IO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -15,6 +15,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import engine.Process.AnnotObject;
+import engine.Process.AnnotedEntitySemiParallel;
 
 /**
  * This class stores the gathered annotations from "enwiki.~ ~.xml" file and save them to another structured XML file. 

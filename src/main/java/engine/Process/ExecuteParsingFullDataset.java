@@ -1,4 +1,4 @@
-package engine;
+package engine.Process;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -9,6 +9,9 @@ import java.util.Calendar;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
+
+import engine.IO.ParserXMLToText;
+import engine.IO.SupportingFileContent;
 
 /**
  * This class creates the dataset as appended text stored as text file. 
